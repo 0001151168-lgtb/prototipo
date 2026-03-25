@@ -1,0 +1,2913 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Kantine Lean - Operação Enxuta</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reset e Estilos Globais */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --gray-color: #7f8c8d;
+            --light-gray: #bdc3c7;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), #1a2530);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            color: var(--secondary-color);
+        }
+
+        .logo-text h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .logo-text p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Sidebar e Conteúdo Principal */
+        .main-content {
+            display: flex;
+            min-height: calc(100vh - 120px);
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: white;
+            box-shadow: var(--shadow);
+            padding: 25px 0;
+            transition: var(--transition);
+        }
+
+        .sidebar.collapsed {
+            width: 70px;
+        }
+
+        .sidebar-toggle {
+            display: flex;
+            justify-content: flex-end;
+            padding: 0 15px 15px;
+            color: var(--gray-color);
+            cursor: pointer;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: var(--dark-color);
+            text-decoration: none;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+            border-left-color: var(--secondary-color);
+        }
+
+        .nav-link.active {
+            background-color: rgba(52, 152, 219, 0.15);
+            border-left-color: var(--secondary-color);
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .nav-icon {
+            font-size: 1.2rem;
+            margin-right: 15px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar.collapsed .nav-text {
+            display: none;
+        }
+
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 15px 0;
+        }
+
+        .sidebar.collapsed .nav-icon {
+            margin-right: 0;
+        }
+
+        .content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        /* Dashboard */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--secondary-color);
+            color: var(--secondary-color);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.estoque {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: var(--secondary-color);
+        }
+
+        .stat-icon.financeiro {
+            background-color: rgba(39, 174, 96, 0.2);
+            color: var(--success-color);
+        }
+
+        .stat-icon.produtividade {
+            background-color: rgba(243, 156, 18, 0.2);
+            color: var(--warning-color);
+        }
+
+        .stat-icon.qualidade {
+            background-color: rgba(155, 89, 182, 0.2);
+            color: #9b59b6;
+        }
+
+        .stat-info h3 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-info p {
+            color: var(--gray-color);
+            font-size: 0.9rem;
+        }
+
+        /* Kanban */
+        .kanban-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .kanban-column {
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+        }
+
+        .kanban-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light-gray);
+        }
+
+        .column-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .item-count {
+            background-color: var(--light-gray);
+            color: var(--dark-color);
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .kanban-items {
+            min-height: 100px;
+        }
+
+        .kanban-item {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .kanban-item:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .kanban-item.critico {
+            border-left-color: var(--accent-color);
+        }
+
+        .kanban-item.alerta {
+            border-left-color: var(--warning-color);
+        }
+
+        .kanban-item.ok {
+            border-left-color: var(--success-color);
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .item-title {
+            font-weight: 600;
+        }
+
+        .item-status {
+            font-size: 0.8rem;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .status-critico {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--accent-color);
+        }
+
+        .status-alerta {
+            background-color: rgba(243, 156, 18, 0.2);
+            color: var(--warning-color);
+        }
+
+        .status-ok {
+            background-color: rgba(39, 174, 96, 0.2);
+            color: var(--success-color);
+        }
+
+        .item-details {
+            font-size: 0.9rem;
+            color: var(--gray-color);
+            margin-bottom: 10px;
+        }
+
+        .item-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--gray-color);
+        }
+
+        /* Formulários */
+        .form-container {
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: var(--primary-color);
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light-gray);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--light-gray);
+            border-radius: var(--radius);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--light-gray);
+        }
+
+        /* Tabelas */
+        .table-container {
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        tbody tr:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 5px;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .edit-btn {
+            color: var(--secondary-color);
+        }
+
+        .edit-btn:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .delete-btn {
+            color: var(--accent-color);
+        }
+
+        .delete-btn:hover {
+            background-color: rgba(231, 76, 60, 0.1);
+        }
+
+        /* Layout Visual */
+        .layout-container {
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 30px;
+            margin-top: 20px;
+        }
+
+        .layout-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 15px;
+            height: 600px;
+            margin-bottom: 30px;
+        }
+
+        .layout-area {
+            border: 2px solid var(--light-gray);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .layout-area:hover {
+            transform: scale(1.02);
+        }
+
+        .area-recepcao {
+            grid-column: 1;
+            grid-row: 1 / 3;
+            background-color: rgba(52, 152, 219, 0.1);
+            border-color: var(--secondary-color);
+        }
+
+        .area-armazenamento {
+            grid-column: 2;
+            grid-row: 1 / 4;
+            background-color: rgba(39, 174, 96, 0.1);
+            border-color: var(--success-color);
+        }
+
+        .area-preparo {
+            grid-column: 3;
+            grid-row: 2 / 4;
+            background-color: rgba(243, 156, 18, 0.1);
+            border-color: var(--warning-color);
+        }
+
+        .area-cozimento {
+            grid-column: 4;
+            grid-row: 2 / 4;
+            background-color: rgba(231, 76, 60, 0.1);
+            border-color: var(--accent-color);
+        }
+
+        .area-montagem {
+            grid-column: 3 / 5;
+            grid-row: 4;
+            background-color: rgba(155, 89, 182, 0.1);
+            border-color: #9b59b6;
+        }
+
+        .area-expedicao {
+            grid-column: 1 / 3;
+            grid-row: 4;
+            background-color: rgba(41, 128, 185, 0.1);
+            border-color: #2980b9;
+        }
+
+        /* Fichas Técnicas */
+        .recipe-card {
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .recipe-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light-gray);
+        }
+
+        .recipe-title {
+            font-size: 1.4rem;
+            color: var(--primary-color);
+        }
+
+        .recipe-cost {
+            font-weight: 600;
+            color: var(--success-color);
+            font-size: 1.2rem;
+        }
+
+        .recipe-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 0.9rem;
+            color: var(--gray-color);
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-weight: 600;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-color);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        /* Responsividade */
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                padding: 15px 0;
+            }
+            
+            .nav-menu {
+                display: flex;
+                overflow-x: auto;
+            }
+            
+            .nav-item {
+                margin-bottom: 0;
+                flex-shrink: 0;
+            }
+            
+            .nav-link {
+                padding: 15px 20px;
+                border-left: none;
+                border-bottom: 3px solid transparent;
+            }
+            
+            .nav-link:hover, .nav-link.active {
+                border-left: none;
+                border-bottom-color: var(--secondary-color);
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .layout-grid {
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .quick-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .layout-grid {
+                grid-template-columns: repeat(2, 1fr);
+                grid-template-rows: repeat(6, 1fr);
+                height: 500px;
+            }
+            
+            .area-recepcao {
+                grid-column: 1;
+                grid-row: 1;
+            }
+            
+            .area-armazenamento {
+                grid-column: 2;
+                grid-row: 1 / 3;
+            }
+            
+            .area-preparo {
+                grid-column: 1;
+                grid-row: 2 / 4;
+            }
+            
+            .area-cozimento {
+                grid-column: 2;
+                grid-row: 3 / 5;
+            }
+            
+            .area-montagem {
+                grid-column: 1;
+                grid-row: 4 / 6;
+            }
+            
+            .area-expedicao {
+                grid-column: 2;
+                grid-row: 5 / 7;
+            }
+        }
+
+        /* Animações */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        /* Notificações */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: var(--radius);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow);
+            z-index: 1001;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .notification.success {
+            background-color: var(--success-color);
+        }
+
+        .notification.warning {
+            background-color: var(--warning-color);
+        }
+
+        .notification.error {
+            background-color: var(--accent-color);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-primary {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: var(--secondary-color);
+        }
+
+        .badge-success {
+            background-color: rgba(39, 174, 96, 0.2);
+            color: var(--success-color);
+        }
+
+        .badge-warning {
+            background-color: rgba(243, 156, 18, 0.2);
+            color: var(--warning-color);
+        }
+
+        .badge-danger {
+            background-color: rgba(231, 76, 60, 0.2);
+            color: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Kantine Lean - Operação Enxuta</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Estilos adicionais para a coluna de validade */
+        .validade-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .validade-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .validade-ok {
+            background-color: #27ae60;
+        }
+        
+        .validade-alerta {
+            background-color: #f39c12;
+        }
+        
+        .validade-critica {
+            background-color: #e74c3c;
+        }
+        
+        .validade-text {
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        /* Ajustes para os modais */
+        .modal {
+            z-index: 10000;
+        }
+        
+        /* Ajustes para os formulários */
+        .form-group input:valid,
+        .form-group select:valid {
+            border-color: #27ae60;
+        }
+        
+        .form-group input:invalid:focus,
+        .form-group select:invalid:focus {
+            border-color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>Sistema Kantine Lean</h1>
+                    <p>Operação Enxuta na Cozinha Industrial</p>
+                </div>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div>
+                    <p>Gerente da Cozinha</p>
+                    <small>Kantine Gastronomia LTDA</small>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <div class="main-content">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" data-page="dashboard">
+                        <i class="fas fa-tachometer-alt nav-icon"></i>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="estoque">
+                        <i class="fas fa-boxes nav-icon"></i>
+                        <span class="nav-text">Controle de Estoque</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="fichas">
+                        <i class="fas fa-book nav-icon"></i>
+                        <span class="nav-text">Fichas Técnicas</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="pcp">
+                        <i class="fas fa-calendar-alt nav-icon"></i>
+                        <span class="nav-text">Planejamento (PCP)</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="layout">
+                        <i class="fas fa-project-diagram nav-icon"></i>
+                        <span class="nav-text">Otimização de Layout</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="relatorios">
+                        <i class="fas fa-chart-bar nav-icon"></i>
+                        <span class="nav-text">Relatórios</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="configuracoes">
+                        <i class="fas fa-cog nav-icon"></i>
+                        <span class="nav-text">Configurações</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Conteúdo Dinâmico -->
+        <main class="content" id="mainContent">
+            <!-- Dashboard será carregado aqui por padrão -->
+            <div class="dashboard-content" id="dashboardPage">
+                <div class="dashboard-header">
+                    <h2 class="page-title">Dashboard - Visão Geral</h2>
+                    <div class="quick-actions">
+                        <button class="btn btn-primary" id="novaFichaBtn">
+                            <i class="fas fa-plus"></i> Nova Ficha Técnica
+                        </button>
+                        <button class="btn btn-success" id="novaCompraBtn">
+                            <i class="fas fa-shopping-cart"></i> Nova Compra
+                        </button>
+                        <button class="btn btn-warning" id="planejamentoBtn">
+                            <i class="fas fa-calendar"></i> Planejar Semana
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Cards de Estatísticas -->
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <div class="stat-icon estoque">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="estoqueCritico">12</h3>
+                            <p>Itens em Estoque Crítico</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon financeiro">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>R$ <span id="custoMedio">8,75</span></h3>
+                            <p>Custo Médio por Porção</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon produtividade">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="produtividade">+18%</h3>
+                            <p>Aumento na Produtividade</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon qualidade">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="validadeCritica">3</h3>
+                            <p>Itens Próximos do Vencimento</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sistema Kanban -->
+                <h3 style="margin: 30px 0 20px;">Controle Visual de Estoque (Kanban)</h3>
+                <div class="kanban-container">
+                    <div class="kanban-column">
+                        <div class="kanban-header">
+                            <div class="column-title">
+                                <i class="fas fa-exclamation-circle" style="color: #e74c3c;"></i>
+                                <span>Crítico</span>
+                                <div class="item-count" id="countCritico">5</div>
+                            </div>
+                        </div>
+                        <div class="kanban-items" id="kanbanCritico">
+                            <!-- Itens críticos serão inseridos aqui via JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="kanban-column">
+                        <div class="kanban-header">
+                            <div class="column-title">
+                                <i class="fas fa-exclamation-triangle" style="color: #f39c12;"></i>
+                                <span>Alerta</span>
+                                <div class="item-count" id="countAlerta">7</div>
+                            </div>
+                        </div>
+                        <div class="kanban-items" id="kanbanAlerta">
+                            <!-- Itens em alerta serão inseridos aqui via JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="kanban-column">
+                        <div class="kanban-header">
+                            <div class="column-title">
+                                <i class="fas fa-check-circle" style="color: #27ae60;"></i>
+                                <span>OK</span>
+                                <div class="item-count" id="countOk">24</div>
+                            </div>
+                        </div>
+                        <div class="kanban-items" id="kanbanOk">
+                            <!-- Itens OK serão inseridos aqui via JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabela de Itens com Validade -->
+                <h3 style="margin: 40px 0 20px;">Itens por Validade</h3>
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Controle de Validade dos Itens</h3>
+                        <select id="filtroValidade" style="width: 200px;">
+                            <option value="todos">Todos</option>
+                            <option value="critica">Próximos do Vencimento</option>
+                            <option value="alerta">Atenção</option>
+                            <option value="ok">OK</option>
+                        </select>
+                    </div>
+                    <table id="validadeTable">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Categoria</th>
+                                <th>Estoque Atual</th>
+                                <th>Data Validade</th>
+                                <th>Dias Restantes</th>
+                                <th>Status Validade</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="validadeTableBody">
+                            <!-- Dados serão inseridos via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Página de Estoque (inicialmente oculta) -->
+            <div class="estoque-content" id="estoquePage" style="display: none;">
+                <div class="dashboard-header">
+                    <h2 class="page-title">Controle de Estoque Kanban</h2>
+                    <div class="quick-actions">
+                        <button class="btn btn-primary" id="novoItemBtn">
+                            <i class="fas fa-plus"></i> Novo Item
+                        </button>
+                        <button class="btn btn-success" id="entradaEstoqueBtn">
+                            <i class="fas fa-arrow-down"></i> Entrada
+                        </button>
+                        <button class="btn btn-warning" id="saidaEstoqueBtn">
+                            <i class="fas fa-arrow-up"></i> Saída
+                        </button>
+                        <button class="btn btn-info" id="movimentacoesBtn">
+                            <i class="fas fa-history"></i> Histórico
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Todos os Itens em Estoque</h3>
+                        <input type="text" id="buscarItemInput" placeholder="Buscar item..." style="width: 300px;">
+                    </div>
+                    <table id="estoqueTable">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Categoria</th>
+                                <th>Estoque Atual</th>
+                                <th>Estoque Mín.</th>
+                                <th>Estoque Máx.</th>
+                                <th>Data Validade</th>
+                                <th>Status Validade</th>
+                                <th>Localização</th>
+                                <th>Status Estoque</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="estoqueTableBody">
+                            <!-- Dados serão inseridos via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Histórico de Movimentações -->
+                <div class="table-container" id="historicoContainer" style="display: none; margin-top: 30px;">
+                    <div class="table-header">
+                        <h3>Histórico de Movimentações</h3>
+                        <div>
+                            <select id="filtroTipoMov">
+                                <option value="todos">Todos os tipos</option>
+                                <option value="entrada">Entradas</option>
+                                <option value="saida">Saídas</option>
+                                <option value="ajuste">Ajustes</option>
+                            </select>
+                            <input type="date" id="filtroDataMov" style="margin-left: 10px;">
+                        </div>
+                    </div>
+                    <table id="historicoTable">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Tipo</th>
+                                <th>Item</th>
+                                <th>Quantidade</th>
+                                <th>Responsável</th>
+                                <th>Motivo</th>
+                                <th>Lote</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historicoTableBody">
+                            <!-- Dados serão inseridos via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Página de Fichas Técnicas (inicialmente oculta) -->
+            <div class="fichas-content" id="fichasPage" style="display: none;">
+                <div class="dashboard-header">
+                    <h2 class="page-title">Fichas Técnicas e POPs</h2>
+                    <div class="quick-actions">
+                        <button class="btn btn-primary" id="novaReceitaBtn">
+                            <i class="fas fa-plus"></i> Nova Receita
+                        </button>
+                        <button class="btn btn-success" id="calcularCustosBtn">
+                            <i class="fas fa-calculator"></i> Calcular Custos
+                        </button>
+                        <button class="btn btn-info" id="gerarPOPBtn">
+                            <i class="fas fa-print"></i> Gerar POP
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tabs" style="margin-bottom: 20px;">
+                    <div class="tab active" data-subtab="fichas-list">Todas as Receitas</div>
+                    <div class="tab" data-subtab="fichas-detail">Detalhes da Receita</div>
+                    <div class="tab" data-subtab="fichas-pops">POPs</div>
+                </div>
+
+                <!-- Lista de Receitas -->
+                <div id="fichas-list" class="tab-content active">
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3>Todas as Receitas Cadastradas</h3>
+                            <select id="filtroCategoriaReceita" style="width: 200px;">
+                                <option value="">Todas as categorias</option>
+                                <option value="Prato Principal">Prato Principal</option>
+                                <option value="Guarnição">Guarnição</option>
+                                <option value="Salada">Salada</option>
+                                <option value="Sobremesa">Sobremesa</option>
+                                <option value="Molho">Molho</option>
+                            </select>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Receita</th>
+                                    <th>Categoria</th>
+                                    <th>Porções</th>
+                                    <th>Custo/Porção</th>
+                                    <th>Tempo</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="receitasTableBody">
+                                <!-- Dados serão inseridos via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Detalhes da Receita -->
+                <div id="fichas-detail" class="tab-content" style="display: none;">
+                    <div class="recipe-card">
+                        <div class="recipe-header">
+                            <h3 class="recipe-title" id="detailRecipeTitle">Feijoada Completa</h3>
+                            <div class="recipe-cost" id="detailRecipeCost">Custo por porção: R$ 8,75</div>
+                        </div>
+                        <div class="recipe-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Categoria</span>
+                                <span class="detail-value" id="detailRecipeCategory">Prato Principal</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Porções</span>
+                                <span class="detail-value" id="detailRecipePortions">20</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Tempo de Preparo</span>
+                                <span class="detail-value" id="detailRecipeTime">120 min</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Rendimento</span>
+                                <span class="detail-value" id="detailRecipeYield">95%</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Custo Total</span>
+                                <span class="detail-value" id="detailRecipeTotalCost">R$ 175,00</span>
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <h4>Ingredientes:</h4>
+                            <table class="ingredients-table" style="width: 100%; margin-top: 10px;">
+                                <thead>
+                                    <tr>
+                                        <th>Ingrediente</th>
+                                        <th>Quantidade</th>
+                                        <th>Custo Unitário</th>
+                                        <th>Custo Total</th>
+                                        <th>Estoque</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ingredientesTableBody">
+                                    <!-- Ingredientes serão inseridos via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <h4>Modo de Preparo (POP):</h4>
+                            <div id="detailRecipeInstructions" style="margin-top: 10px; padding: 15px; background-color: #f8f9fa; border-radius: var(--radius);">
+                                <ol id="recipeInstructionsList" style="margin-left: 20px;">
+                                    <!-- Passos serão inseridos via JavaScript -->
+                                </ol>
+                            </div>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <h4>Informações Nutricionais (por porção):</h4>
+                            <div class="recipe-details" style="margin-top: 10px;">
+                                <div class="detail-item">
+                                    <span class="detail-label">Calorias</span>
+                                    <span class="detail-value" id="detailRecipeCalories">450 kcal</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Proteínas</span>
+                                    <span class="detail-value" id="detailRecipeProteins">25g</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Carboidratos</span>
+                                    <span class="detail-value" id="detailRecipeCarbs">35g</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Gorduras</span>
+                                    <span class="detail-value" id="detailRecipeFats">18g</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-actions" style="margin-top: 30px;">
+                            <button class="btn btn-primary" id="editarReceitaBtn">Editar Ficha</button>
+                            <button class="btn btn-outline" id="imprimirPOPBtn">Imprimir POP</button>
+                            <button class="btn btn-success" id="produzirReceitaBtn">Produzir Receita</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- POPs -->
+                <div id="fichas-pops" class="tab-content" style="display: none;">
+                    <div class="pops-container">
+                        <h3>Procedimentos Operacionais Padrão (POPs)</h3>
+                        <p style="margin-bottom: 20px; color: var(--gray-color);">
+                            POPs padronizam os processos da cozinha para garantir qualidade e segurança alimentar.
+                        </p>
+                        
+                        <div class="pop-card">
+                            <div class="pop-header">
+                                <h4>POP-001: Recebimento de Matéria-Prima</h4>
+                                <span class="badge badge-success">Ativo</span>
+                            </div>
+                            <div class="pop-body">
+                                <p><strong>Objetivo:</strong> Estabelecer o procedimento para recebimento, inspeção e armazenamento de matéria-prima.</p>
+                                <p><strong>Responsável:</strong> Auxiliar de Cozinha/Estoquista</p>
+                                <div class="pop-steps">
+                                    <h5>Passos do Procedimento:</h5>
+                                    <ol>
+                                        <li>Verificar nota fiscal e pedido de compra</li>
+                                        <li>Inspecionar qualidade dos produtos (cor, odor, textura, validade)</li>
+                                        <li>Rejeitar produtos fora do padrão ou vencidos</li>
+                                        <li>Registrar entrada no sistema com lote e validade</li>
+                                        <li>Armazenar conforme categoria (seco, refrigerado, congelado)</li>
+                                        <li>Aplicar etiqueta com data de recebimento e validade</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pop-card">
+                            <div class="pop-header">
+                                <h4>POP-002: Pré-preparo de Hortifruti</h4>
+                                <span class="badge badge-success">Ativo</span>
+                            </div>
+                            <div class="pop-body">
+                                <p><strong>Objetivo:</strong> Padronizar o processo de higienização e corte de frutas, legumes e verduras.</p>
+                                <p><strong>Responsável:</strong> Auxiliar de Cozinha</p>
+                                <div class="pop-steps">
+                                    <h5>Passos do Procedimento:</h5>
+                                    <ol>
+                                        <li>Selecionar e separar produtos por tipo</li>
+                                        <li>Lavar em água corrente para remover sujidades</li>
+                                        <li>Imersão em solução clorada (200ppm por 15 minutos)</li>
+                                        <li>Enxágue em água potável</li>
+                                        <li>Secar em centrífuga de saladas ou papel toalha</li>
+                                        <li>Cortar conforme padrão estabelecido na ficha técnica</li>
+                                        <li>Armazenar em recipientes identificados e datados</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Página de Layout (inicialmente oculta) -->
+            <div class="layout-content" id="layoutPage" style="display: none;">
+                <div class="dashboard-header">
+                    <h2 class="page-title">Otimização de Layout</h2>
+                    <div class="quick-actions">
+                        <button class="btn btn-primary" id="simularFluxoBtn">
+                            <i class="fas fa-shoe-prints"></i> Simular Fluxo
+                        </button>
+                        <button class="btn btn-success" id="proporLayoutBtn">
+                            <i class="fas fa-lightbulb"></i> Propor Melhorias
+                        </button>
+                    </div>
+                </div>
+
+                <div class="layout-container">
+                    <h3 style="margin-bottom: 20px;">Layout Atual da Cozinha</h3>
+                    <p style="margin-bottom: 20px; color: var(--gray-color);">
+                        Clique em cada área para ver detalhes e sugestões de melhoria.
+                    </p>
+                    
+                    <div class="layout-grid">
+                        <div class="layout-area area-recepcao" data-area="recepcao">
+                            <div>
+                                <h4>Recepção MP</h4>
+                                <p>Entrada de matérias-primas</p>
+                            </div>
+                        </div>
+                        <div class="layout-area area-armazenamento" data-area="armazenamento">
+                            <div>
+                                <h4>Armazenamento</h4>
+                                <p>Estoque seco e frio</p>
+                            </div>
+                        </div>
+                        <div class="layout-area area-preparo" data-area="preparo">
+                            <div>
+                                <h4>Preparo</h4>
+                                <p>Corte, lavagem, pré-preparo</p>
+                            </div>
+                        </div>
+                        <div class="layout-area area-cozimento" data-area="cozimento">
+                            <div>
+                                <h4>Cozimento</h4>
+                                <p>Fogões, fornos, chapa</p>
+                            </div>
+                        </div>
+                        <div class="layout-area area-montagem" data-area="montagem">
+                            <div>
+                                <h4>Montagem</h4>
+                                <p>Porcionamento e montagem</p>
+                            </div>
+                        </div>
+                        <div class="layout-area area-expedicao" data-area="expedicao">
+                            <div>
+                                <h4>Expedição</h4>
+                                <p>Embalagem e distribuição</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="areaDetails" style="margin-top: 30px; padding: 20px; background-color: rgba(52, 152, 219, 0.05); border-radius: var(--radius);">
+                        <h4>Clique em uma área para ver detalhes</h4>
+                        <p>Selecione uma área do layout para visualizar informações específicas e sugestões de melhoria.</p>
+                    </div>
+                </div>
+
+                <div class="table-container" style="margin-top: 30px;">
+                    <div class="table-header">
+                        <h3>Fluxos Identificados (Diagrama Espaguete)</h3>
+                        <button class="btn btn-outline" id="calcularDeslocamentosBtn">
+                            <i class="fas fa-ruler"></i> Calcular Deslocamentos
+                        </button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Origem</th>
+                                <th>Destino</th>
+                                <th>Distância (m)</th>
+                                <th>Tipo</th>
+                                <th>Observação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fluxosTableBody">
+                            <!-- Dados serão inseridos via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para Novo Item -->
+    <div class="modal" id="novoItemModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Cadastrar Novo Item no Estoque</h3>
+                <button class="modal-close" id="closeNovoItemModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="novoItemForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="itemCodigo">Código do Item *</label>
+                            <input type="text" id="itemCodigo" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="itemNome">Nome do Item *</label>
+                            <input type="text" id="itemNome" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="itemCategoria">Categoria *</label>
+                            <select id="itemCategoria" required>
+                                <option value="">Selecione...</option>
+                                <option value="Proteína">Proteína</option>
+                                <option value="Legume">Legume</option>
+                                <option value="Grão">Grão</option>
+                                <option value="Tempero">Tempero</option>
+                                <option value="Líquido">Líquido</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="itemUnidade">Unidade *</label>
+                            <select id="itemUnidade" required>
+                                <option value="">Selecione...</option>
+                                <option value="kg">kg</option>
+                                <option value="g">g</option>
+                                <option value="un">un</option>
+                                <option value="lt">lt</option>
+                                <option value="ml">ml</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="estoqueMin">Estoque Mínimo *</label>
+                            <input type="number" id="estoqueMin" required min="0" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="estoqueMax">Estoque Máximo *</label>
+                            <input type="number" id="estoqueMax" required min="0" step="0.01">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="localizacao">Localização na Cozinha *</label>
+                            <input type="text" id="localizacao" placeholder="Ex: Prateleira A1, Freezer 2" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="quantidadeInicial">Quantidade Inicial</label>
+                            <input type="number" id="quantidadeInicial" min="0" step="0.01" value="0">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="validadePadrao">Validade Padrão (dias)</label>
+                            <input type="number" id="validadePadrao" min="1" value="30">
+                            <small>Número de dias padrão para validade deste item</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="custoUnitario">Custo Unitário (R$)</label>
+                            <input type="number" id="custoUnitario" min="0" step="0.01" value="0">
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" id="cancelarNovoItem">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar Item</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Nova Ficha Técnica -->
+    <div class="modal" id="novaFichaModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Nova Ficha Técnica</h3>
+                <button class="modal-close" id="closeFichaModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="novaFichaForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="receitaCodigo">Código da Receita *</label>
+                            <input type="text" id="receitaCodigo" required placeholder="Ex: REC001">
+                        </div>
+                        <div class="form-group">
+                            <label for="receitaNome">Nome da Receita *</label>
+                            <input type="text" id="receitaNome" required placeholder="Ex: Feijoada Completa">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="receitaCategoria">Categoria *</label>
+                            <select id="receitaCategoria" required>
+                                <option value="">Selecione...</option>
+                                <option value="Prato Principal">Prato Principal</option>
+                                <option value="Guarnição">Guarnição</option>
+                                <option value="Salada">Salada</option>
+                                <option value="Sobremesa">Sobremesa</option>
+                                <option value="Molho">Molho</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="receitaPorcoes">Número de Porções *</label>
+                            <input type="number" id="receitaPorcoes" required min="1" value="1">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tempoPreparo">Tempo de Preparo (minutos) *</label>
+                            <input type="number" id="tempoPreparo" required min="1" value="30">
+                        </div>
+                        <div class="form-group">
+                            <label for="rendimento">Rendimento Esperado (%)</label>
+                            <input type="number" id="rendimento" min="1" max="100" value="95">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="receitaDescricao">Descrição da Receita</label>
+                        <textarea id="receitaDescricao" rows="3" placeholder="Descreva brevemente a receita..."></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" id="cancelarFicha">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Criar Ficha</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Entrada de Produto -->
+    <div class="modal" id="entradaModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Registrar Entrada de Produto</h3>
+                <button class="modal-close" id="closeEntradaModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="entradaForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="entradaItem">Item *</label>
+                            <select id="entradaItem" required>
+                                <option value="">Selecione um item...</option>
+                                <!-- Opções serão preenchidas via JavaScript -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="entradaQuantidade">Quantidade *</label>
+                            <input type="number" id="entradaQuantidade" required min="0.01" step="0.01">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="entradaLote">Número do Lote</label>
+                            <input type="text" id="entradaLote" placeholder="Opcional">
+                        </div>
+                        <div class="form-group">
+                            <label for="entradaValidade">Data de Validade</label>
+                            <input type="date" id="entradaValidade">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="entradaFornecedor">Fornecedor</label>
+                            <input type="text" id="entradaFornecedor" placeholder="Nome do fornecedor">
+                        </div>
+                        <div class="form-group">
+                            <label for="entradaNotaFiscal">Nº Nota Fiscal</label>
+                            <input type="text" id="entradaNotaFiscal" placeholder="Número da nota fiscal">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="entradaObservacoes">Observações</label>
+                        <textarea id="entradaObservacoes" rows="3" placeholder="Observações sobre a entrada..."></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" id="cancelarEntrada">Cancelar</button>
+                        <button type="submit" class="btn btn-success">Registrar Entrada</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Saída de Produto -->
+    <div class="modal" id="saidaModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Registrar Saída de Produto</h3>
+                <button class="modal-close" id="closeSaidaModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="saidaForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="saidaItem">Item *</label>
+                            <select id="saidaItem" required>
+                                <option value="">Selecione um item...</option>
+                                <!-- Opções serão preenchidas via JavaScript -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="saidaQuantidade">Quantidade *</label>
+                            <input type="number" id="saidaQuantidade" required min="0.01" step="0.01">
+                            <small id="estoqueDisponivel" style="color: var(--gray-color);"></small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="saidaMotivo">Motivo da Saída *</label>
+                            <select id="saidaMotivo" required>
+                                <option value="">Selecione...</option>
+                                <option value="producao">Produção</option>
+                                <option value="avaria">Avaria/Perda</option>
+                                <option value="ajuste">Ajuste de Estoque</option>
+                                <option value="transferencia">Transferência</option>
+                                <option value="outro">Outro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="saidaResponsavel">Responsável *</label>
+                            <input type="text" id="saidaResponsavel" required value="Cozinha">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="saidaLote">Lote (PEPS/FIFO)</label>
+                            <select id="saidaLote">
+                                <option value="">Automático (PEPS)</option>
+                                <!-- Opções de lotes serão preenchidas via JavaScript -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="saidaReceita">Receita/Produção</label>
+                            <input type="text" id="saidaReceita" placeholder="Nome da receita ou produção">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="saidaObservacoes">Observações</label>
+                        <textarea id="saidaObservacoes" rows="3" placeholder="Observações sobre a saída..."></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" id="cancelarSaida">Cancelar</button>
+                        <button type="submit" class="btn btn-warning">Registrar Saída</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificação -->
+    <div class="notification" id="notification" style="display: none;">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText">Operação realizada com sucesso!</span>
+    </div>
+
+    <script>
+        // Dados de exemplo (simulando banco de dados)
+        let estoqueData = [
+            { 
+                id: 1, 
+                codigo: "ING001", 
+                nome: "Arroz", 
+                categoria: "Grão", 
+                quantidade: 30, 
+                unidade: "kg", 
+                estoqueMin: 10, 
+                estoqueMax: 50, 
+                localizacao: "Prateleira A1", 
+                status: "ok", 
+                custoUnitario: 5.50,
+                validadePadrao: 365,
+                lotes: [
+                    { numeroLote: "LOTE-ARZ-001", quantidade: 10, dataValidade: "2024-06-15" },
+                    { numeroLote: "LOTE-ARZ-002", quantidade: 20, dataValidade: "2024-08-20" }
+                ]
+            },
+            { 
+                id: 2, 
+                codigo: "ING002", 
+                nome: "Feijão", 
+                categoria: "Grão", 
+                quantidade: 15, 
+                unidade: "kg", 
+                estoqueMin: 5, 
+                estoqueMax: 25, 
+                localizacao: "Prateleira A2", 
+                status: "ok", 
+                custoUnitario: 8.20,
+                validadePadrao: 180,
+                lotes: [
+                    { numeroLote: "LOTE-FEJ-001", quantidade: 15, dataValidade: "2024-03-10" }
+                ]
+            },
+            { 
+                id: 3, 
+                codigo: "ING003", 
+                nome: "Carne Bovina", 
+                categoria: "Proteína", 
+                quantidade: 8, 
+                unidade: "kg", 
+                estoqueMin: 3, 
+                estoqueMax: 15, 
+                localizacao: "Freezer 1", 
+                status: "alerta", 
+                custoUnitario: 32.90,
+                validadePadrao: 90,
+                lotes: [
+                    { numeroLote: "LOTE-CRN-001", quantidade: 8, dataValidade: "2023-12-05" }
+                ]
+            },
+            { 
+                id: 4, 
+                codigo: "ING004", 
+                nome: "Frango", 
+                categoria: "Proteína", 
+                quantidade: 12, 
+                unidade: "kg", 
+                estoqueMin: 5, 
+                estoqueMax: 20, 
+                localizacao: "Freezer 2", 
+                status: "ok", 
+                custoUnitario: 18.50,
+                validadePadrao: 90,
+                lotes: [
+                    { numeroLote: "LOTE-FRG-001", quantidade: 12, dataValidade: "2024-01-20" }
+                ]
+            },
+            { 
+                id: 5, 
+                codigo: "ING005", 
+                nome: "Batata", 
+                categoria: "Legume", 
+                quantidade: 8, 
+                unidade: "kg", 
+                estoqueMin: 8, 
+                estoqueMax: 30, 
+                localizacao: "Geladeira 1", 
+                status: "critico", 
+                custoUnitario: 4.80,
+                validadePadrao: 30,
+                lotes: [
+                    { numeroLote: "LOTE-BAT-001", quantidade: 8, dataValidade: "2023-11-01" }
+                ]
+            }
+        ];
+
+        // Histórico de movimentações
+        let historicoData = [
+            { id: 1, data: "2023-10-10", tipo: "entrada", itemId: 1, quantidade: 20, responsavel: "Fornecedor Alimentos SA", motivo: "Compra regular", lote: "LOTE-ARZ-002" },
+            { id: 2, data: "2023-10-09", tipo: "saida", itemId: 1, quantidade: 5, responsavel: "Cozinha", motivo: "Produção: Arroz Integral", lote: "LOTE-ARZ-001" },
+            { id: 3, data: "2023-10-08", tipo: "entrada", itemId: 3, quantidade: 8, responsavel: "Frigorífico Boi Gordo", motivo: "Compra semanal", lote: "LOTE-CRN-001" },
+            { id: 4, data: "2023-10-07", tipo: "saida", itemId: 5, quantidade: 10, responsavel: "Cozinha", motivo: "Produção: Purê de Batata", lote: "" }
+        ];
+
+        // Dados de receitas (expandido)
+        let receitasData = [
+            { 
+                id: 1, 
+                codigo: "REC001", 
+                nome: "Feijoada Completa", 
+                categoria: "Prato Principal", 
+                porcoes: 20, 
+                tempoPreparo: 120, 
+                custoPorcao: 8.75,
+                custoTotal: 175.00,
+                rendimento: 95,
+                descricao: "Tradicional feijoada brasileira com carne bovina e linguiça",
+                status: "ativo",
+                calorias: 450,
+                proteinas: 25,
+                carboidratos: 35,
+                gorduras: 18,
+                ingredientes: [
+                    { itemId: 2, quantidade: 2.5, unidade: "kg", custoUnitario: 8.20, observacao: "Feijão preto" },
+                    { itemId: 3, quantidade: 3.0, unidade: "kg", custoUnitario: 32.90, observacao: "Carne bovina em cubos" }
+                ],
+                instrucoes: [
+                    "Lavar o feijão e deixar de molho por 8 horas",
+                    "Cozinhar o feijão na panela de pressão por 40 minutos",
+                    "Refogar a cebola e o alho no óleo",
+                    "Adicionar a carne e cozinhar até dourar",
+                    "Misturar o feijão cozido e ajustar o sal",
+                    "Cozinhar em fogo baixo por 30 minutos"
+                ]
+            },
+            { 
+                id: 2, 
+                codigo: "REC002", 
+                nome: "Arroz Integral", 
+                categoria: "Guarnição", 
+                porcoes: 30, 
+                tempoPreparo: 30, 
+                custoPorcao: 1.20,
+                custoTotal: 36.00,
+                rendimento: 98,
+                descricao: "Arroz integral cozido no vapor",
+                status: "ativo",
+                calorias: 120,
+                proteinas: 3,
+                carboidratos: 25,
+                gorduras: 1,
+                ingredientes: [
+                    { itemId: 1, quantidade: 3.0, unidade: "kg", custoUnitario: 5.50, observacao: "Arroz integral" }
+                ],
+                instrucoes: [
+                    "Lavar o arroz em água corrente",
+                    "Refogar o arroz no óleo por 2 minutos",
+                    "Adicionar água na proporção 2:1 (água:arroz)",
+                    "Cozinhar em fogo baixo por 25 minutos",
+                    "Deixar repousar por 5 minutos antes de servir"
+                ]
+            }
+        ];
+
+        let fluxosData = [
+            { origem: "Recepção MP", destino: "Armazenamento", distancia: 10, tipo: "Normal", observacao: "MP para estoque" },
+            { origem: "Armazenamento", destino: "Preparo", distancia: 15, tipo: "Normal", observacao: "Busca ingredientes" }
+        ];
+
+        // DOM Elements
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const pages = {
+            dashboard: document.getElementById('dashboardPage'),
+            estoque: document.getElementById('estoquePage'),
+            fichas: document.getElementById('fichasPage'),
+            layout: document.getElementById('layoutPage')
+        };
+
+        // Modal Elements
+        const novoItemModal = document.getElementById('novoItemModal');
+        const novaFichaModal = document.getElementById('novaFichaModal');
+        const entradaModal = document.getElementById('entradaModal');
+        const saidaModal = document.getElementById('saidaModal');
+        const notification = document.getElementById('notification');
+
+        // Variáveis de controle
+        let receitaAtualId = null;
+
+        // Função para mostrar notificação
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'flex';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // Função para calcular a validade mais próxima de um item
+        function calcularValidadeMaisProxima(item) {
+            if (!item.lotes || item.lotes.length === 0) {
+                return { dataValidade: null, diasRestantes: null, status: 'ok' };
+            }
+            
+            // Ordenar lotes por data de validade (mais próxima primeiro)
+            const lotesOrdenados = [...item.lotes].sort((a, b) => 
+                new Date(a.dataValidade) - new Date(b.dataValidade)
+            );
+            
+            const hoje = new Date();
+            const validadeMaisProxima = new Date(lotesOrdenados[0].dataValidade);
+            const diffTime = validadeMaisProxima - hoje;
+            const diasRestantes = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            let status = 'ok';
+            if (diasRestantes <= 0) {
+                status = 'critica'; // Vencido
+            } else if (diasRestantes <= 15) {
+                status = 'critica'; // Próximo do vencimento (15 dias)
+            } else if (diasRestantes <= 30) {
+                status = 'alerta'; // Atenção (30 dias)
+            }
+            
+            return {
+                dataValidade: validadeMaisProxima.toISOString().split('T')[0],
+                diasRestantes,
+                status
+            };
+        }
+
+        // Função para formatar data
+        function formatarData(dataString) {
+            if (!dataString) return 'N/A';
+            const data = new Date(dataString);
+            return data.toLocaleDateString('pt-BR');
+        }
+
+        // Função para atualizar o status do item baseado na quantidade
+        function atualizarStatusItem(item) {
+            const percentual = (item.quantidade / item.estoqueMax) * 100;
+            
+            if (item.quantidade <= item.estoqueMin * 0.3) {
+                return 'critico';
+            } else if (item.quantidade <= item.estoqueMin) {
+                return 'alerta';
+            } else {
+                return 'ok';
+            }
+        }
+
+        // Função para buscar item pelo ID
+        function buscarItemPorId(id) {
+            return estoqueData.find(item => item.id == id);
+        }
+
+        // Função para buscar receita pelo ID
+        function buscarReceitaPorId(id) {
+            return receitasData.find(receita => receita.id == id);
+        }
+
+        // Função para registrar entrada de produto
+        function registrarEntrada(itemId, quantidade, lote, validade, fornecedor, notaFiscal, observacoes) {
+            // Encontrar o item
+            const itemIndex = estoqueData.findIndex(item => item.id == itemId);
+            
+            if (itemIndex === -1) return false;
+            
+            // Atualizar quantidade
+            estoqueData[itemIndex].quantidade += parseFloat(quantidade);
+            
+            // Atualizar status
+            estoqueData[itemIndex].status = atualizarStatusItem(estoqueData[itemIndex]);
+            
+            // Adicionar lote
+            const novoLote = {
+                numeroLote: lote || `LOTE-${Date.now()}`,
+                quantidade: parseFloat(quantidade),
+                dataValidade: validade || calcularDataValidadePadrao(itemId)
+            };
+            
+            if (!estoqueData[itemIndex].lotes) {
+                estoqueData[itemIndex].lotes = [];
+            }
+            
+            estoqueData[itemIndex].lotes.push(novoLote);
+            
+            // Registrar no histórico
+            const novaMovimentacao = {
+                id: historicoData.length + 1,
+                data: new Date().toISOString().split('T')[0],
+                tipo: "entrada",
+                itemId: itemId,
+                quantidade: parseFloat(quantidade),
+                responsavel: fornecedor || "Fornecedor não informado",
+                motivo: observacoes || "Entrada de estoque",
+                lote: lote || ""
+            };
+            historicoData.push(novaMovimentacao);
+            
+            return true;
+        }
+
+        // Função para calcular data de validade padrão
+        function calcularDataValidadePadrao(itemId) {
+            const item = buscarItemPorId(itemId);
+            if (!item || !item.validadePadrao) {
+                // Padrão: 30 dias a partir de hoje
+                const data = new Date();
+                data.setDate(data.getDate() + 30);
+                return data.toISOString().split('T')[0];
+            }
+            
+            const data = new Date();
+            data.setDate(data.getDate() + item.validadePadrao);
+            return data.toISOString().split('T')[0];
+        }
+
+        // Função para inicializar o select de itens nos modais
+        function inicializarSelectItens(selectId) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+            
+            select.innerHTML = '<option value="">Selecione um item...</option>';
+            
+            estoqueData.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = `${item.nome} (Estoque: ${item.quantidade} ${item.unidade})`;
+                select.appendChild(option);
+            });
+        }
+
+        // Função para inicializar tabela de histórico
+        function initHistoricoTable(filtroTipo = 'todos', filtroData = '') {
+            const tableBody = document.getElementById('historicoTableBody');
+            if (!tableBody) return;
+            
+            tableBody.innerHTML = '';
+            
+            let historicoFiltrado = historicoData;
+            
+            // Aplicar filtros
+            if (filtroTipo !== 'todos') {
+                historicoFiltrado = historicoFiltrado.filter(mov => mov.tipo === filtroTipo);
+            }
+            
+            if (filtroData) {
+                historicoFiltrado = historicoFiltrado.filter(mov => mov.data === filtroData);
+            }
+            
+            // Ordenar por data (mais recente primeiro)
+            historicoFiltrado.sort((a, b) => new Date(b.data) - new Date(a.data));
+            
+            historicoFiltrado.forEach(mov => {
+                const item = buscarItemPorId(mov.itemId);
+                const itemNome = item ? item.nome : "Item não encontrado";
+                
+                // Determinar cor do badge baseado no tipo
+                let badgeClass = 'badge-primary';
+                if (mov.tipo === 'entrada') badgeClass = 'badge-success';
+                if (mov.tipo === 'saida') badgeClass = 'badge-warning';
+                if (mov.tipo === 'ajuste') badgeClass = 'badge-danger';
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${mov.data}</td>
+                    <td><span class="badge ${badgeClass}">${mov.tipo.toUpperCase()}</span></td>
+                    <td>${itemNome}</td>
+                    <td>${mov.quantidade}</td>
+                    <td>${mov.responsavel}</td>
+                    <td>${mov.motivo}</td>
+                    <td>${mov.lote || "-"}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Função para inicializar tabela de estoque
+        function initEstoqueTable() {
+            const tableBody = document.getElementById('estoqueTableBody');
+            if (!tableBody) return;
+            
+            tableBody.innerHTML = '';
+            
+            estoqueData.forEach(item => {
+                // Determinar status e cor
+                let statusText, statusClass;
+                if (item.status === 'critico') {
+                    statusText = 'Crítico';
+                    statusClass = 'badge-danger';
+                } else if (item.status === 'alerta') {
+                    statusText = 'Alerta';
+                    statusClass = 'badge-warning';
+                } else {
+                    statusText = 'OK';
+                    statusClass = 'badge-success';
+                }
+                
+                // Calcular validade
+                const validadeInfo = calcularValidadeMaisProxima(item);
+                
+                // Determinar status de validade
+                let validadeStatusClass, validadeStatusText;
+                if (validadeInfo.status === 'critica') {
+                    validadeStatusClass = 'validade-critica';
+                    validadeStatusText = validadeInfo.diasRestantes <= 0 ? 'Vencido' : 'Crítica';
+                } else if (validadeInfo.status === 'alerta') {
+                    validadeStatusClass = 'validade-alerta';
+                    validadeStatusText = 'Atenção';
+                } else {
+                    validadeStatusClass = 'validade-ok';
+                    validadeStatusText = 'OK';
+                }
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <strong>${item.nome}</strong><br>
+                        <small>Código: ${item.codigo}</small>
+                    </td>
+                    <td>${item.categoria}</td>
+                    <td>
+                        <strong>${item.quantidade} ${item.unidade}</strong><br>
+                        <small>${((item.quantidade / item.estoqueMax) * 100).toFixed(1)}% do máximo</small>
+                    </td>
+                    <td>${item.estoqueMin} ${item.unidade}</td>
+                    <td>${item.estoqueMax} ${item.unidade}</td>
+                    <td>${validadeInfo.dataValidade ? formatarData(validadeInfo.dataValidade) : 'N/A'}</td>
+                    <td>
+                        <div class="validade-status">
+                            <div class="validade-indicator ${validadeStatusClass}"></div>
+                            <span class="validade-text">${validadeStatusText}${validadeInfo.diasRestantes !== null ? ` (${validadeInfo.diasRestantes} dias)` : ''}</span>
+                        </div>
+                    </td>
+                    <td>${item.localizacao}</td>
+                    <td><span class="badge ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <div class="table-actions">
+                            <button class="action-btn entrada-rapida-btn" data-id="${item.id}" title="Entrada rápida">
+                                <i class="fas fa-arrow-down" style="color: var(--success-color);"></i>
+                            </button>
+                            <button class="action-btn saida-rapida-btn" data-id="${item.id}" title="Saída rápida">
+                                <i class="fas fa-arrow-up" style="color: var(--warning-color);"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            
+            // Adicionar eventos aos botões de ação rápida
+            document.querySelectorAll('.entrada-rapida-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const itemId = btn.getAttribute('data-id');
+                    const item = buscarItemPorId(itemId);
+                    
+                    // Preencher modal de entrada com o item selecionado
+                    document.getElementById('entradaItem').value = itemId;
+                    
+                    // Mostrar modal de entrada
+                    entradaModal.classList.add('active');
+                });
+            });
+            
+            document.querySelectorAll('.saida-rapida-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const itemId = btn.getAttribute('data-id');
+                    const item = buscarItemPorId(itemId);
+                    
+                    // Preencher modal de saída com o item selecionado
+                    document.getElementById('saidaItem').value = itemId;
+                    atualizarEstoqueDisponivel(itemId);
+                    
+                    // Mostrar modal de saída
+                    saidaModal.classList.add('active');
+                });
+            });
+        }
+
+        // Função para inicializar tabela de validade no dashboard
+        function initValidadeTable(filtro = 'todos') {
+            const tableBody = document.getElementById('validadeTableBody');
+            if (!tableBody) return;
+            
+            tableBody.innerHTML = '';
+            
+            let itensFiltrados = estoqueData;
+            
+            // Aplicar filtro
+            if (filtro !== 'todos') {
+                itensFiltrados = estoqueData.filter(item => {
+                    const validadeInfo = calcularValidadeMaisProxima(item);
+                    return validadeInfo.status === filtro;
+                });
+            }
+            
+            // Ordenar por validade (mais próxima primeiro)
+            itensFiltrados.sort((a, b) => {
+                const validadeA = calcularValidadeMaisProxima(a);
+                const validadeB = calcularValidadeMaisProxima(b);
+                
+                if (validadeA.diasRestantes === null && validadeB.diasRestantes === null) return 0;
+                if (validadeA.diasRestantes === null) return 1;
+                if (validadeB.diasRestantes === null) return -1;
+                
+                return validadeA.diasRestantes - validadeB.diasRestantes;
+            });
+            
+            // Contar itens com validade crítica
+            let countCritica = 0;
+            estoqueData.forEach(item => {
+                const validadeInfo = calcularValidadeMaisProxima(item);
+                if (validadeInfo.status === 'critica') {
+                    countCritica++;
+                }
+            });
+            
+            // Atualizar contador no dashboard
+            document.getElementById('validadeCritica').textContent = countCritica;
+            
+            itensFiltrados.forEach(item => {
+                const validadeInfo = calcularValidadeMaisProxima(item);
+                
+                // Determinar status de validade
+                let validadeStatusClass, validadeStatusText;
+                if (validadeInfo.status === 'critica') {
+                    validadeStatusClass = 'validade-critica';
+                    validadeStatusText = validadeInfo.diasRestantes <= 0 ? 'Vencido' : 'Crítica';
+                } else if (validadeInfo.status === 'alerta') {
+                    validadeStatusClass = 'validade-alerta';
+                    validadeStatusText = 'Atenção';
+                } else {
+                    validadeStatusClass = 'validade-ok';
+                    validadeStatusText = 'OK';
+                }
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <strong>${item.nome}</strong><br>
+                        <small>Código: ${item.codigo}</small>
+                    </td>
+                    <td>${item.categoria}</td>
+                    <td>
+                        <strong>${item.quantidade} ${item.unidade}</strong>
+                    </td>
+                    <td>${validadeInfo.dataValidade ? formatarData(validadeInfo.dataValidade) : 'N/A'}</td>
+                    <td>${validadeInfo.diasRestantes !== null ? validadeInfo.diasRestantes : 'N/A'}</td>
+                    <td>
+                        <div class="validade-status">
+                            <div class="validade-indicator ${validadeStatusClass}"></div>
+                            <span class="validade-text">${validadeStatusText}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline" onclick="consumirItem(${item.id})">
+                            <i class="fas fa-utensils"></i> Consumir
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Função para consumir item (simplificada)
+        window.consumirItem = function(itemId) {
+            const item = buscarItemPorId(itemId);
+            if (!item) return;
+            
+            const quantidade = prompt(`Quantidade de ${item.nome} a consumir (em ${item.unidade}):`, "1");
+            if (!quantidade || isNaN(quantidade) || parseFloat(quantidade) <= 0) {
+                showNotification('Quantidade inválida!', 'error');
+                return;
+            }
+            
+            if (parseFloat(quantidade) > item.quantidade) {
+                showNotification(`Estoque insuficiente! Disponível: ${item.quantidade} ${item.unidade}`, 'error');
+                return;
+            }
+            
+            // Registrar saída
+            historicoData.push({
+                id: historicoData.length + 1,
+                data: new Date().toISOString().split('T')[0],
+                tipo: "saida",
+                itemId: itemId,
+                quantidade: parseFloat(quantidade),
+                responsavel: "Cozinha",
+                motivo: "Consumo direto",
+                lote: ""
+            });
+            
+            // Atualizar estoque
+            item.quantidade -= parseFloat(quantidade);
+            item.status = atualizarStatusItem(item);
+            
+            // Atualizar interfaces
+            initEstoqueTable();
+            updateKanban();
+            initValidadeTable();
+            
+            showNotification(`${quantidade} ${item.unidade} de ${item.nome} consumido com sucesso!`, 'success');
+        };
+
+        // Função para inicializar Kanban
+        function updateKanban() {
+            // Contadores
+            let countCritico = 0, countAlerta = 0, countOk = 0;
+            
+            // Calcular contadores
+            estoqueData.forEach(item => {
+                if (item.status === 'critico') {
+                    countCritico++;
+                } else if (item.status === 'alerta') {
+                    countAlerta++;
+                } else {
+                    countOk++;
+                }
+            });
+            
+            // Atualizar contadores
+            document.getElementById('countCritico').textContent = countCritico;
+            document.getElementById('countAlerta').textContent = countAlerta;
+            document.getElementById('countOk').textContent = countOk;
+            document.getElementById('estoqueCritico').textContent = countCritico;
+            
+            // Limpar e atualizar kanban
+            ['kanbanCritico', 'kanbanAlerta', 'kanbanOk'].forEach(columnId => {
+                const column = document.getElementById(columnId);
+                if (column) column.innerHTML = '';
+            });
+            
+            estoqueData.forEach(item => {
+                let columnId;
+                if (item.status === 'critico') {
+                    columnId = 'kanbanCritico';
+                } else if (item.status === 'alerta') {
+                    columnId = 'kanbanAlerta';
+                } else {
+                    columnId = 'kanbanOk';
+                }
+                
+                const column = document.getElementById(columnId);
+                if (!column) return;
+                
+                const itemElement = document.createElement('div');
+                itemElement.className = `kanban-item ${item.status}`;
+                itemElement.innerHTML = `
+                    <div class="item-header">
+                        <div class="item-title">${item.nome}</div>
+                        <div class="item-status status-${item.status}">${item.status === 'critico' ? 'Crítico' : item.status === 'alerta' ? 'Alerta' : 'OK'}</div>
+                    </div>
+                    <div class="item-details">
+                        Estoque: ${item.quantidade} ${item.unidade}<br>
+                        Mín: ${item.estoqueMin} | Máx: ${item.estoqueMax}
+                    </div>
+                    <div class="item-footer">
+                        <div>${item.localizacao}</div>
+                        <div>${((item.quantidade / item.estoqueMax) * 100).toFixed(1)}%</div>
+                    </div>
+                `;
+                
+                column.appendChild(itemElement);
+            });
+        }
+
+        // Função para inicializar tabela de receitas
+        function initReceitasTable(filtroCategoria = '') {
+            const tableBody = document.getElementById('receitasTableBody');
+            if (!tableBody) return;
+            
+            tableBody.innerHTML = '';
+            
+            let receitasFiltradas = receitasData;
+            
+            // Aplicar filtro de categoria
+            if (filtroCategoria) {
+                receitasFiltradas = receitasFiltradas.filter(receita => receita.categoria === filtroCategoria);
+            }
+            
+            receitasFiltradas.forEach(receita => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <strong>${receita.nome}</strong><br>
+                        <small>Código: ${receita.codigo}</small>
+                    </td>
+                    <td>${receita.categoria}</td>
+                    <td>${receita.porcoes}</td>
+                    <td>R$ ${receita.custoPorcao.toFixed(2)}</td>
+                    <td>${receita.tempoPreparo} min</td>
+                    <td><span class="badge ${receita.status === 'ativo' ? 'badge-success' : 'badge-warning'}">${receita.status === 'ativo' ? 'Ativo' : 'Inativo'}</span></td>
+                    <td>
+                        <div class="table-actions">
+                            <button class="action-btn view-btn" data-id="${receita.id}" title="Visualizar">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            
+            // Adicionar eventos aos botões
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-id');
+                    exibirDetalhesReceita(id);
+                });
+            });
+        }
+
+        // Função para exibir detalhes da receita
+        function exibirDetalhesReceita(id) {
+            const receita = buscarReceitaPorId(id);
+            if (!receita) return;
+            
+            receitaAtualId = id;
+            
+            // Atualizar informações básicas
+            document.getElementById('detailRecipeTitle').textContent = receita.nome;
+            document.getElementById('detailRecipeCost').textContent = `Custo por porção: R$ ${receita.custoPorcao.toFixed(2)}`;
+            document.getElementById('detailRecipeCategory').textContent = receita.categoria;
+            document.getElementById('detailRecipePortions').textContent = receita.porcoes;
+            document.getElementById('detailRecipeTime').textContent = `${receita.tempoPreparo} min`;
+            document.getElementById('detailRecipeYield').textContent = `${receita.rendimento}%`;
+            document.getElementById('detailRecipeTotalCost').textContent = `R$ ${receita.custoTotal.toFixed(2)}`;
+            document.getElementById('detailRecipeCalories').textContent = `${receita.calories} kcal`;
+            document.getElementById('detailRecipeProteins').textContent = `${receita.proteinas}g`;
+            document.getElementById('detailRecipeCarbs').textContent = `${receita.carboidratos}g`;
+            document.getElementById('detailRecipeFats').textContent = `${receita.gorduras}g`;
+            
+            // Atualizar tabela de ingredientes
+            const ingredientesBody = document.getElementById('ingredientesTableBody');
+            ingredientesBody.innerHTML = '';
+            
+            receita.ingredientes.forEach(ing => {
+                const item = buscarItemPorId(ing.itemId);
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item ? item.nome : 'Ingrediente não encontrado'} ${ing.observacao ? `(${ing.observacao})` : ''}</td>
+                    <td>${ing.quantidade} ${ing.unidade}</td>
+                    <td>R$ ${(ing.custoUnitario || 0).toFixed(2)}</td>
+                    <td>R$ ${(ing.quantidade * (ing.custoUnitario || 0)).toFixed(2)}</td>
+                    <td>
+                        <span class="badge ${item && item.quantidade >= ing.quantidade ? 'badge-success' : 'badge-danger'}">
+                            ${item ? `${item.quantidade} ${item.unidade}` : 'N/A'}
+                        </span>
+                    </td>
+                `;
+                ingredientesBody.appendChild(row);
+            });
+            
+            // Atualizar instruções
+            const instrucoesList = document.getElementById('recipeInstructionsList');
+            instrucoesList.innerHTML = '';
+            
+            receita.instrucoes.forEach((instrucao, index) => {
+                const li = document.createElement('li');
+                li.textContent = instrucao;
+                instrucoesList.appendChild(li);
+            });
+            
+            // Alternar para a aba de detalhes
+            document.querySelectorAll('#fichasPage .tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('#fichasPage .tab-content').forEach(content => content.style.display = 'none');
+            
+            document.querySelector('#fichasPage .tab[data-subtab="fichas-detail"]').classList.add('active');
+            document.getElementById('fichas-detail').style.display = 'block';
+        }
+
+        // Função para atualizar o estoque disponível no modal de saída
+        function atualizarEstoqueDisponivel(itemId) {
+            const item = buscarItemPorId(itemId);
+            const estoqueDisponivelEl = document.getElementById('estoqueDisponivel');
+            
+            if (item) {
+                estoqueDisponivelEl.textContent = `Disponível: ${item.quantidade} ${item.unidade}`;
+                document.getElementById('saidaQuantidade').max = item.quantidade;
+            } else {
+                estoqueDisponivelEl.textContent = '';
+            }
+        }
+
+        // Inicializar a aplicação
+        function initApp() {
+            // Inicializar tabelas e listas
+            initEstoqueTable();
+            updateKanban();
+            initHistoricoTable();
+            initReceitasTable();
+            initValidadeTable();
+            
+            // Inicializar selects
+            inicializarSelectItens('entradaItem');
+            inicializarSelectItens('saidaItem');
+            
+            // Exibir página inicial (dashboard)
+            pages.dashboard.style.display = 'block';
+            
+            // Adicionar classe active ao primeiro item do menu
+            document.querySelector('.nav-link').classList.add('active');
+            
+            // Exibir notificação de boas-vindas
+            setTimeout(() => {
+                showNotification('Bem-vindo ao Sistema Kantine Lean! Sistema carregado com sucesso.', 'success');
+            }, 1000);
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            initApp();
+            
+            // Navegação entre páginas
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    // Remover classe active de todos os links
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    
+                    // Adicionar classe active ao link clicado
+                    link.classList.add('active');
+                    
+                    // Ocultar todas as páginas
+                    Object.values(pages).forEach(page => {
+                        if (page) page.style.display = 'none';
+                    });
+                    
+                    // Mostrar a página correspondente
+                    const pageName = link.getAttribute('data-page');
+                    if (pages[pageName]) {
+                        pages[pageName].style.display = 'block';
+                        
+                        if (pageName === 'dashboard') {
+                            initValidadeTable();
+                        }
+                    }
+                });
+            });
+            
+            // Botões para abrir modais
+            document.getElementById('novoItemBtn').addEventListener('click', () => {
+                novoItemModal.classList.add('active');
+            });
+            
+            document.getElementById('novaFichaBtn').addEventListener('click', () => {
+                novaFichaModal.classList.add('active');
+            });
+            
+            document.getElementById('novaReceitaBtn').addEventListener('click', () => {
+                novaFichaModal.classList.add('active');
+            });
+            
+            document.getElementById('entradaEstoqueBtn').addEventListener('click', () => {
+                inicializarSelectItens('entradaItem');
+                entradaModal.classList.add('active');
+            });
+            
+            document.getElementById('saidaEstoqueBtn').addEventListener('click', () => {
+                inicializarSelectItens('saidaItem');
+                saidaModal.classList.add('active');
+            });
+            
+            // Fechar modais
+            document.getElementById('closeNovoItemModal').addEventListener('click', () => {
+                novoItemModal.classList.remove('active');
+            });
+            
+            document.getElementById('closeFichaModal').addEventListener('click', () => {
+                novaFichaModal.classList.remove('active');
+            });
+            
+            document.getElementById('closeEntradaModal').addEventListener('click', () => {
+                entradaModal.classList.remove('active');
+            });
+            
+            document.getElementById('closeSaidaModal').addEventListener('click', () => {
+                saidaModal.classList.remove('active');
+            });
+            
+            document.getElementById('cancelarNovoItem').addEventListener('click', () => {
+                novoItemModal.classList.remove('active');
+            });
+            
+            document.getElementById('cancelarFicha').addEventListener('click', () => {
+                novaFichaModal.classList.remove('active');
+            });
+            
+            document.getElementById('cancelarEntrada').addEventListener('click', () => {
+                entradaModal.classList.remove('active');
+            });
+            
+            document.getElementById('cancelarSaida').addEventListener('click', () => {
+                saidaModal.classList.remove('active');
+            });
+            
+            // Formulário de Novo Item
+            document.getElementById('novoItemForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // Coletar dados do formulário
+                const novoItem = {
+                    id: estoqueData.length + 1,
+                    codigo: document.getElementById('itemCodigo').value,
+                    nome: document.getElementById('itemNome').value,
+                    categoria: document.getElementById('itemCategoria').value,
+                    quantidade: parseFloat(document.getElementById('quantidadeInicial').value) || 0,
+                    unidade: document.getElementById('itemUnidade').value,
+                    estoqueMin: parseFloat(document.getElementById('estoqueMin').value),
+                    estoqueMax: parseFloat(document.getElementById('estoqueMax').value),
+                    localizacao: document.getElementById('localizacao').value,
+                    validadePadrao: parseInt(document.getElementById('validadePadrao').value) || 30,
+                    custoUnitario: parseFloat(document.getElementById('custoUnitario').value) || 0,
+                    status: 'ok',
+                    lotes: []
+                };
+                
+                // Adicionar ao array de dados
+                estoqueData.push(novoItem);
+                
+                // Atualizar interface
+                initEstoqueTable();
+                updateKanban();
+                initValidadeTable();
+                
+                // Fechar modal e mostrar notificação
+                novoItemModal.classList.remove('active');
+                showNotification(`Item "${novoItem.nome}" cadastrado com sucesso!`, 'success');
+                
+                // Limpar formulário
+                document.getElementById('novoItemForm').reset();
+            });
+            
+            // Formulário de Nova Ficha Técnica
+            document.getElementById('novaFichaForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // Coletar dados do formulário
+                const novaReceita = {
+                    id: receitasData.length + 1,
+                    codigo: document.getElementById('receitaCodigo').value,
+                    nome: document.getElementById('receitaNome').value,
+                    categoria: document.getElementById('receitaCategoria').value,
+                    porcoes: parseInt(document.getElementById('receitaPorcoes').value),
+                    tempoPreparo: parseInt(document.getElementById('tempoPreparo').value),
+                    rendimento: parseInt(document.getElementById('rendimento').value) || 95,
+                    descricao: document.getElementById('receitaDescricao').value,
+                    custoPorcao: 0,
+                    custoTotal: 0,
+                    status: 'ativo',
+                    calorias: 0,
+                    proteinas: 0,
+                    carboidratos: 0,
+                    gorduras: 0,
+                    ingredientes: [],
+                    instrucoes: []
+                };
+                
+                // Adicionar ao array de dados
+                receitasData.push(novaReceita);
+                
+                // Atualizar interface
+                initReceitasTable();
+                
+                // Fechar modal e mostrar notificação
+                novaFichaModal.classList.remove('active');
+                showNotification(`Ficha técnica "${novaReceita.nome}" criada com sucesso!`, 'success');
+                
+                // Limpar formulário
+                document.getElementById('novaFichaForm').reset();
+                
+                // Exibir detalhes da nova receita
+                exibirDetalhesReceita(novaReceita.id);
+            });
+            
+            // Formulário de Entrada
+            document.getElementById('entradaForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const itemId = document.getElementById('entradaItem').value;
+                const quantidade = document.getElementById('entradaQuantidade').value;
+                const lote = document.getElementById('entradaLote').value;
+                const validade = document.getElementById('entradaValidade').value;
+                const fornecedor = document.getElementById('entradaFornecedor').value;
+                const notaFiscal = document.getElementById('entradaNotaFiscal').value;
+                const observacoes = document.getElementById('entradaObservacoes').value;
+                
+                if (!itemId || !quantidade || quantidade <= 0) {
+                    showNotification('Preencha todos os campos obrigatórios corretamente.', 'error');
+                    return;
+                }
+                
+                const sucesso = registrarEntrada(itemId, quantidade, lote, validade, fornecedor, notaFiscal, observacoes);
+                
+                if (sucesso) {
+                    const item = buscarItemPorId(itemId);
+                    showNotification(`Entrada de ${quantidade} ${item.unidade} de ${item.nome} registrada com sucesso!`, 'success');
+                    
+                    // Atualizar interfaces
+                    initEstoqueTable();
+                    updateKanban();
+                    initValidadeTable();
+                    
+                    // Fechar modal e limpar formulário
+                    entradaModal.classList.remove('active');
+                    document.getElementById('entradaForm').reset();
+                } else {
+                    showNotification('Erro ao registrar entrada. Tente novamente.', 'error');
+                }
+            });
+            
+            // Formulário de Saída
+            document.getElementById('saidaForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const itemId = document.getElementById('saidaItem').value;
+                const quantidade = document.getElementById('saidaQuantidade').value;
+                const motivo = document.getElementById('saidaMotivo').value;
+                const responsavel = document.getElementById('saidaResponsavel').value;
+                const loteSelecionado = document.getElementById('saidaLote').value;
+                const receita = document.getElementById('saidaReceita').value;
+                const observacoes = document.getElementById('saidaObservacoes').value;
+                
+                if (!itemId || !quantidade || quantidade <= 0 || !motivo || !responsavel) {
+                    showNotification('Preencha todos os campos obrigatórios corretamente.', 'error');
+                    return;
+                }
+                
+                // Verificar se há estoque suficiente
+                const item = buscarItemPorId(itemId);
+                if (item.quantidade < quantidade) {
+                    showNotification(`Estoque insuficiente! Disponível: ${item.quantidade} ${item.unidade}`, 'error');
+                    return;
+                }
+                
+                // Atualizar quantidade
+                item.quantidade -= parseFloat(quantidade);
+                item.status = atualizarStatusItem(item);
+                
+                // Registrar no histórico
+                historicoData.push({
+                    id: historicoData.length + 1,
+                    data: new Date().toISOString().split('T')[0],
+                    tipo: "saida",
+                    itemId: itemId,
+                    quantidade: parseFloat(quantidade),
+                    responsavel: responsavel,
+                    motivo: motivo + (receita ? `: ${receita}` : ''),
+                    lote: loteSelecionado || ""
+                });
+                
+                showNotification(`Saída de ${quantidade} ${item.unidade} de ${item.nome} registrada com sucesso!`, 'success');
+                
+                // Atualizar interfaces
+                initEstoqueTable();
+                updateKanban();
+                initValidadeTable();
+                initHistoricoTable();
+                
+                // Fechar modal e limpar formulário
+                saidaModal.classList.remove('active');
+                document.getElementById('saidaForm').reset();
+            });
+            
+            // Filtro de validade
+            document.getElementById('filtroValidade').addEventListener('change', function() {
+                initValidadeTable(this.value);
+            });
+            
+            // Filtro de categoria de receitas
+            document.getElementById('filtroCategoriaReceita').addEventListener('change', function() {
+                initReceitasTable(this.value);
+            });
+            
+            // Botão de nova compra no dashboard
+            document.getElementById('novaCompraBtn').addEventListener('click', () => {
+                // Navegar para página de estoque e abrir modal de entrada
+                document.querySelector('.nav-link[data-page="estoque"]').click();
+                setTimeout(() => {
+                    document.getElementById('entradaEstoqueBtn').click();
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>
+</body>
+</html>
