@@ -88,9 +88,66 @@ let estoqueData = [
         validadePadrao: 30,
         validadePadraoData: null,
         lotes: [
-            { numeroLote: "LOTE-BAT-001", quantidade: 8, dataValidade: "2026-08-01" }
+            { numeroLote: "LOTE-BAT-001", quantidade: 8, dataValidade: "2027-08-01" }
         ]
-    }
+    },
+    {
+        id: 6,
+        codigo: "ING006",
+        nome: "Alho",
+        categoria: "Tempero",
+        quantidade: 7,
+        unidade: "kg",
+        estoqueMin: 5,
+        estoqueMax: 30,
+        localizacao: "Prateleira A2",
+        status: "ok",
+        custoUnitario: 5.50,
+        validadePadrao: 365,
+        validadePadraoData: null,
+        lotes: [
+            { numeroLote: "LOTE-ALH-003", quantidade: 10, dataValidade: "2026-07-18" }
+           
+        ]
+    },
+    {
+        id: 7,
+        codigo: "ING007",
+        nome: "Pernil",
+        categoria: "Proteina",
+        quantidade: 17,
+        unidade: "kg",
+        estoqueMin: 15,
+        estoqueMax: 30,
+        localizacao: "Freezer 1",
+        status: "ok",
+        custoUnitario: 5.50,
+        validadePadrao: 365,
+        validadePadraoData: null,
+        lotes: [
+            { numeroLote: "LOTE-PORCO-005", quantidade: 10, dataValidade: "2026-08-12" }
+           
+        ]
+    },
+    {
+        id: 8,
+        codigo: "ING008",
+        nome: "Oléo",
+        categoria: "Oléos/Azeites",
+        quantidade: 30,
+        unidade: "lt",
+        estoqueMin: 10,
+        estoqueMax: 50,
+        localizacao: "Prateleira A2",
+        status: "ok",
+        custoUnitario: 5.50,
+        validadePadrao: 365,
+        validadePadraoData: null,
+        lotes: [
+            { numeroLote: "LOTE-OLEO-001", quantidade: 10, dataValidade: "2026-06-12" }
+        
+        ]
+    },
 ];
 
 // Histórico de movimentações - DATA ATUALIZADA (hoje)
@@ -529,25 +586,26 @@ function initValidadeTable(filtro = 'todos') {
             <td>${validadeInfo.dataValidade ? formatarData(validadeInfo.dataValidade) : 'N/A'}</td>
             <td>${diasTexto || 'N/A'}</td>
             <td><div class="validade-status"><div class="validade-indicator ${validadeStatusClass}"></div><span class="validade-text">${validadeStatusText}</span></div></td>
-            <td><button class="btn btn-sm btn-outline" onclick="consumirItem(${item.id})"><i class="fas fa-utensils"></i> Consumir</button></td>
+            <td><button class="btn btn-sm btn-outline" onclick="consumirItem(${item.id})"><i class="fas fa-utensils"></i> Retirar</button></td>
         `;
         tableBody.appendChild(row);
     });
 }
 
-// ===================== CONSUMIR ITEM =====================
+// ===================== CONSUMIR ITEM (agora "Retirar") =====================
 window.consumirItem = function(itemId) {
     const item = buscarItemPorId(itemId);
     if (!item) return;
 
-    const quantidade = prompt(`Quantidade de ${item.nome} a consumir (em ${item.unidade}):`, "1");
+    const quantidade = prompt(`Quantidade de ${item.nome} a retirar (em ${item.unidade}):`, "1");
     if (!quantidade || isNaN(quantidade) || parseFloat(quantidade) <= 0) {
         showNotification('Quantidade inválida!', 'error');
         return;
     }
 
-    if (parseFloat(quantidade) > item.quantidade) {
-        showNotification(`Estoque insuficiente! Disponível: ${item.quantidade} ${item.unidade}`, 'error');
+    const qtd = parseFloat(quantidade);
+    if (qtd > item.quantidade) {
+        showNotification(`❌ Estoque insuficiente! Disponível: ${item.quantidade} ${item.unidade}. Retirada não permitida.`, 'error');
         return;
     }
 
@@ -556,21 +614,21 @@ window.consumirItem = function(itemId) {
         data: new Date().toISOString().split('T')[0],
         tipo: "saida",
         itemId: itemId,
-        quantidade: parseFloat(quantidade),
+        quantidade: qtd,
         unidade: item.unidade,
         responsavel: "Cozinha",
-        motivo: "Consumo direto",
+        motivo: "Retirada direta",
         lote: ""
     });
 
-    item.quantidade -= parseFloat(quantidade);
+    item.quantidade -= qtd;
     item.status = atualizarStatusItem(item);
 
     initEstoqueTable();
     updateKanban();
     initValidadeTable();
 
-    showNotification(`${quantidade} ${item.unidade} de ${item.nome} consumido com sucesso!`, 'success');
+    showNotification(`${qtd} ${item.unidade} de ${item.nome} retirado com sucesso!`, 'success');
 };
 
 // ===================== KANBAN =====================
@@ -634,15 +692,23 @@ function initReceitasTable(filtroCategoria = '') {
             <td>R$ ${receita.custoPorcao.toFixed(2)}</td>
             <td>${receita.tempoPreparo} min</td>
             <td><span class="badge ${receita.status === 'ativo' ? 'badge-success' : 'badge-warning'}">${receita.status === 'ativo' ? 'Ativo' : 'Inativo'}</span></td>
-            <td><div class="table-actions"><button class="action-btn view-btn" data-id="${receita.id}" title="Visualizar"><i class="fas fa-eye"></i></button></div></td>
+            <td>
+                <div class="table-actions">
+                    <button class="action-btn view-btn" data-id="${receita.id}" title="Visualizar"><i class="fas fa-eye"></i></button>
+                    <button class="action-btn edit-recipe-btn" data-id="${receita.id}" title="Editar"><i class="fas fa-edit"></i></button>
+                </div>
+            </td>
         `;
         tableBody.appendChild(row);
-    });
 
-    document.querySelectorAll('.view-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const id = btn.getAttribute('data-id');
+        row.querySelector('.view-btn').addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
             exibirDetalhesReceita(id);
+        });
+
+        row.querySelector('.edit-recipe-btn').addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            carregarReceitaParaEdicao(id);
         });
     });
 }
@@ -695,13 +761,30 @@ function exibirDetalhesReceita(id) {
     document.getElementById('fichas-detail').style.display = 'block';
 }
 
+// ========== FUNÇÃO DE CÁLCULO DE CUSTOS ==========
+function calcularCustosReceita(ingredientes, porcoes) {
+    let custoTotal = 0;
+    ingredientes.forEach(ing => {
+        const item = buscarItemPorId(ing.itemId);
+        if (item) {
+            const quantidadeEmBase = converterQuantidade(ing.quantidade, ing.unidade, item.unidade);
+            custoTotal += quantidadeEmBase * (item.custoUnitario || 0);
+        }
+    });
+    const custoPorcao = porcoes > 0 ? custoTotal / porcoes : 0;
+    return { custoTotal, custoPorcao };
+}
+
+// ========== FUNÇÃO CARREGAR RECEITA PARA EDIÇÃO ==========
 function carregarReceitaParaEdicao(id) {
-    const receita = buscarReceitaPorId(id);
+    const receitaId = parseInt(id, 10);
+    const receita = buscarReceitaPorId(receitaId);
     if (!receita) {
         showNotification('Receita não encontrada!', 'error');
         return;
     }
-    editandoReceitaId = id;
+    editandoReceitaId = receitaId;
+
     document.getElementById('receitaCodigo').value = receita.codigo;
     document.getElementById('receitaNome').value = receita.nome;
     document.getElementById('receitaCategoria').value = receita.categoria;
@@ -709,6 +792,19 @@ function carregarReceitaParaEdicao(id) {
     document.getElementById('tempoPreparo').value = receita.tempoPreparo;
     document.getElementById('lucro').value = receita.lucro;
     document.getElementById('receitaDescricao').value = receita.descricao || '';
+
+    ingredientesTemp = receita.ingredientes.map(ing => {
+        const item = buscarItemPorId(ing.itemId);
+        return {
+            itemId: ing.itemId,
+            nome: item ? item.nome : 'Item não encontrado',
+            quantidade: ing.quantidade,
+            unidade: ing.unidade,
+            custoUnitario: ing.custoUnitario || (item ? item.custoUnitario : 0),
+            observacao: ing.observacao || ''
+        };
+    });
+    atualizarListaIngredientesModal();
 
     document.querySelector('#novaFichaModal .modal-title').textContent = 'Editar Ficha Técnica';
     novaFichaModal.classList.add('active');
@@ -721,8 +817,6 @@ function atualizarEstoqueDisponivel(itemId) {
 
     if (item) {
         estoqueDisponivelEl.textContent = `Disponível: ${item.quantidade} ${item.unidade}`;
-        document.getElementById('saidaQuantidade').max = item.quantidade;
-
         if (saidaUnidadeSelect) {
             saidaUnidadeSelect.value = item.unidade;
         }
@@ -914,7 +1008,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ===================== BOTÃO PRODUZIR RECEITA =====================
+    // ===================== BOTÃO PRODUZIR RECEITA (MÚLTIPLAS VEZES) =====================
     document.getElementById('produzirReceitaBtn').addEventListener('click', function() {
         if (receitaAtualId === null) {
             showNotification('Nenhuma receita selecionada para produção.', 'warning');
@@ -932,10 +1026,17 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const vezesInput = prompt(`Quantas vezes deseja produzir a receita "${receita.nome}"?`, "1");
+        if (vezesInput === null) return;
+        const vezes = parseInt(vezesInput);
+        if (isNaN(vezes) || vezes <= 0) {
+            showNotification('Quantidade inválida. Deve ser um número positivo.', 'error');
+            return;
+        }
+
         let podeProduzir = true;
         let faltantes = [];
 
-        // Verificar estoque
         receita.ingredientes.forEach(ing => {
             const item = buscarItemPorId(ing.itemId);
             if (!item) {
@@ -943,7 +1044,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 faltantes.push(`Ingrediente ID ${ing.itemId} não encontrado no estoque`);
                 return;
             }
-            const quantidadeNecessaria = converterQuantidade(ing.quantidade, ing.unidade, item.unidade);
+            const quantidadeNecessaria = converterQuantidade(ing.quantidade, ing.unidade, item.unidade) * vezes;
             if (item.quantidade < quantidadeNecessaria) {
                 podeProduzir = false;
                 faltantes.push(`${item.nome} (precisa: ${quantidadeNecessaria.toFixed(2)} ${item.unidade}, disponível: ${item.quantidade} ${item.unidade})`);
@@ -951,14 +1052,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (!podeProduzir) {
-            showNotification(`❌ Estoque insuficiente para produzir "${receita.nome}". Itens faltantes: ${faltantes.join('; ')}`, 'error');
+            showNotification(`❌ Estoque insuficiente para produzir "${receita.nome}" ${vezes} vez(es). Itens faltantes: ${faltantes.join('; ')}`, 'error');
             return;
         }
 
-        // Consumir itens
         receita.ingredientes.forEach(ing => {
             const item = buscarItemPorId(ing.itemId);
-            const quantidadeNecessaria = converterQuantidade(ing.quantidade, ing.unidade, item.unidade);
+            const quantidadeNecessaria = converterQuantidade(ing.quantidade, ing.unidade, item.unidade) * vezes;
             item.quantidade = Math.round((item.quantidade - quantidadeNecessaria) * 1000) / 1000;
             item.status = atualizarStatusItem(item);
 
@@ -970,17 +1070,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 quantidade: quantidadeNecessaria,
                 unidade: item.unidade,
                 responsavel: "Cozinha",
-                motivo: `Produção: ${receita.nome}`,
+                motivo: `Produção (${vezes}x): ${receita.nome}`,
                 lote: ""
             });
         });
 
-        // Atualizar interface
         initEstoqueTable();
         updateKanban();
         initValidadeTable();
         initHistoricoTable();
-        showNotification(`✅ Receita "${receita.nome}" produzida com sucesso! Ingredientes consumidos do estoque.`, 'success');
+        showNotification(`✅ Receita "${receita.nome}" produzida ${vezes} vez(es) com sucesso!`, 'success');
     });
 
     document.getElementById('novoItemBtn').addEventListener('click', () => novoItemModal.classList.add('active'));
@@ -1082,6 +1181,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('novoItemForm').reset();
     });
 
+    // ========== SUBMISSÃO DO FORMULÁRIO DE FICHA ==========
     document.getElementById('novaFichaForm').addEventListener('submit', (e) => {
         e.preventDefault();
 
@@ -1101,6 +1201,8 @@ document.addEventListener('DOMContentLoaded', () => {
             observacao: ing.observacao || ''
         }));
 
+        const { custoTotal, custoPorcao } = calcularCustosReceita(ingredientes, porcoes);
+
         if (editandoReceitaId !== null) {
             const index = receitasData.findIndex(r => r.id === editandoReceitaId);
             if (index !== -1) {
@@ -1112,7 +1214,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 receitasData[index].lucro = lucro;
                 receitasData[index].descricao = descricao;
                 receitasData[index].ingredientes = ingredientes;
+                receitasData[index].custoTotal = custoTotal;
+                receitasData[index].custoPorcao = custoPorcao;
                 showNotification(`Ficha técnica "${nome}" atualizada com sucesso!`, 'success');
+                initReceitasTable();
+                if (receitaAtualId && receitaAtualId === editandoReceitaId) {
+                    exibirDetalhesReceita(editandoReceitaId);
+                }
             } else {
                 showNotification('Erro ao atualizar ficha. Receita não encontrada.', 'error');
                 return;
@@ -1129,8 +1237,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 tempoPreparo: tempoPreparo,
                 lucro: lucro,
                 descricao: descricao,
-                custoPorcao: 0,
-                custoTotal: 0,
+                custoPorcao: custoPorcao,
+                custoTotal: custoTotal,
                 status: 'ativo',
                 calorias: 0,
                 proteinas: 0,
@@ -1141,20 +1249,13 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             receitasData.push(novaReceita);
             showNotification(`Ficha técnica "${nome}" criada com sucesso!`, 'success');
+            initReceitasTable();
         }
 
-        initReceitasTable();
         novaFichaModal.classList.remove('active');
         document.getElementById('novaFichaForm').reset();
         ingredientesTemp = [];
         atualizarListaIngredientesModal();
-
-        if (receitaAtualId) {
-            const receitaAtual = buscarReceitaPorId(receitaAtualId);
-            if (receitaAtual) {
-                exibirDetalhesReceita(receitaAtual.id);
-            }
-        }
     });
 
     document.getElementById('entradaForm').addEventListener('submit', (e) => {
@@ -1211,7 +1312,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const quantidadeEmBase = converterQuantidade(quantidade, unidadeSaida, item.unidade);
 
         if (quantidadeEmBase > item.quantidade) {
-            showNotification(`Estoque insuficiente! Disponível: ${item.quantidade} ${item.unidade}`, 'error');
+            showNotification(`❌ Estoque insuficiente! Disponível: ${item.quantidade} ${item.unidade}. Saída não permitida.`, 'error');
             return;
         }
 

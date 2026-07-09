@@ -58,18 +58,6 @@
                         <span class="nav-text">Fichas Técnicas</span>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" data-page="relatorios">
-                        <i class="fas fa-chart-bar nav-icon"></i>
-                        <span class="nav-text">Relatórios</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" data-page="configuracoes">
-                        <i class="fas fa-cog nav-icon"></i>
-                        <span class="nav-text">Configurações</span>
-                    </a>
-                </li>
             </ul>
         </nav>
 
@@ -105,15 +93,6 @@
                         <div class="stat-info critico">
                             <h3><span id="custoMedio"></span></h3>
                             <p>Produtos Vencidos</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon produtividade">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3 id="produtividade">+16%</h3>
-                            <p>Aumento na Produtividade (30 dias)</p>
                         </div>
                     </div>
                     <div class="stat-card">
@@ -167,7 +146,7 @@
                         <h3>Controle de Validade dos Itens</h3>
                         <select id="filtroValidade" style="width:200px;">
                             <option value="todos">Todos</option>
-                            <option value="critica">Próximos do Vencimento</option>
+                            <option value="critica">Próximos do Vencimento/Vencidos</option>
                             <option value="alerta">Atenção</option>
                             <option value="ok">OK</option>
                         </select>
@@ -245,7 +224,7 @@
                                 <th>Item</th>
                                 <th>Quantidade</th>
                                 <th>Unidade</th>
-                                <th>Responsável</th>
+                                <th>Fornecedor/Responsável</th>
                                 <th>Motivo</th>
                                 <th>Lote</th>
                             </tr>
@@ -281,6 +260,7 @@
                                 <option value="Salada">Salada</option>
                                 <option value="Sobremesa">Sobremesa</option>
                                 <option value="Molho">Molho</option>
+                                <option value="outro">Outro</option>
                             </select>
                         </div>
                         <table>
@@ -441,6 +421,7 @@
         </main>
     </div>
 
+    <!-- Modais (mantidos iguais) -->
     <div class="modal" id="novoItemModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -468,8 +449,8 @@
                                 <option value="Legume">Legume</option>
                                 <option value="Grão">Grão</option>
                                 <option value="Tempero">Tempero</option>
-                                <option value="Líquido">Líquido</option>
-                                <option value="Outro">Outro</option>
+                                <option value="oleo">Oléos/Azeites</option>
+                                <option value="Outro">Outros</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -487,11 +468,11 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="estoqueMin">Estoque Mínimo *</label>
-                            <input type="number" id="estoqueMin" required min="0" step="0.01" />
+                            <input type="number" id="estoqueMin" required min="0" step="any" />
                         </div>
                         <div class="form-group">
                             <label for="estoqueMax">Estoque Máximo *</label>
-                            <input type="number" id="estoqueMax" required min="0" step="0.01" />
+                            <input type="number" id="estoqueMax" required min="0" step="any" />
                         </div>
                     </div>
                     <div class="form-row">
@@ -501,7 +482,7 @@
                         </div>
                         <div class="form-group">
                             <label for="quantidadeInicial">Quantidade</label>
-                            <input type="number" id="quantidadeInicial" min="0" step="0.01" value="0" />
+                            <input type="number" id="quantidadeInicial" min="0" step="any" value="0" />
                         </div>
                     </div>
                     <div class="form-row">
@@ -512,7 +493,7 @@
                         </div>
                         <div class="form-group">
                             <label for="custoUnitario">Custo Unitário (R$)</label>
-                            <input type="number" id="custoUnitario" min="0" step="0.01" value="0" />
+                            <input type="number" id="custoUnitario" min="0" step="any" value="0" />
                         </div>
                     </div>
                     <div class="form-actions">
@@ -585,7 +566,7 @@
                             </div>
                             <div class="form-group" style="flex:1;">
                                 <label for="ingredienteQuantidade">Quantidade</label>
-                                <input type="number" id="ingredienteQuantidade" min="0.01" step="0.01" value="1" />
+                                <input type="number" id="ingredienteQuantidade" min="0.01" step="any" value="1" />
                             </div>
                             <div class="form-group" style="flex:1;">
                                 <label for="ingredienteUnidade">Unidade</label>
@@ -642,7 +623,7 @@
                         </div>
                         <div class="form-group">
                             <label for="entradaQuantidade">Quantidade *</label>
-                            <input type="number" id="entradaQuantidade" required min="0.01" step="0.01" />
+                            <input type="number" id="entradaQuantidade" required min="0.01" step="any" />
                         </div>
                     </div>
                     <div class="form-row">
@@ -697,7 +678,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="saidaQuantidade">Quantidade *</label>
-                            <input type="number" id="saidaQuantidade" required min="0.01" step="0.01" />
+                            <input type="number" id="saidaQuantidade" required min="0.01" step="any" />
                             <small id="estoqueDisponivel" style="color: var(--gray-color);"></small>
                         </div>
                         <div class="form-group">
@@ -735,7 +716,6 @@
                                 <option value="">Automático (PEPS)</option>
                             </select>
                         </div>
-                       
                     </div>
                     <div class="form-group">
                         <label for="saidaObservacoes">Observações</label>

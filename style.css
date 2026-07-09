@@ -265,9 +265,7 @@ body {
     padding: 25px;
     box-shadow: var(--shadow);
     display: flex;
-    
 }
-  
 
 .stat-icon {
     width: 60px;
@@ -312,14 +310,11 @@ body {
 
 .stat-info p {
     color: var(--gray-color);
-
 }
 
 .stat-info.critico p {
-    color: var(--gray-color);
     color: white;
 }
-
 
 /* Kanban */
 .kanban-container {
@@ -1044,81 +1039,4 @@ tbody tr:hover {
         grid-column: 2;
         grid-row: 5 / 7;
     }
-}
-/* Tooltip para produtos vencidos */
-.stat-card.critico {
-    position: relative;
-    cursor: pointer;
-    overflow: visible;
-}
-
-.tooltip-vencidos {
-    display: none;
-    position: absolute;
-    top: calc(100% + 10px);
-    left: 0;
-    background: #fff;
-    border-radius: var(--radius);
-    padding: 15px;
-    min-width: 260px;
-    max-width: 350px;
-    max-height: 250px;
-    overflow-y: auto;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-    border: 1px solid var(--light-gray);
-    z-index: 1000;
-    color: #333;
-    font-weight: normal;
-    text-align: left;
-}
-
-.stat-card.critico:hover .tooltip-vencidos {
-    display: block;
-}
-
-.tooltip-vencidos::before {
-    content: '';
-    position: absolute;
-    top: -8px;
-    left: 20px;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-bottom: 8px solid #fff;
-    filter: drop-shadow(0 -2px 2px rgba(0,0,0,0.1));
-}
-
-.tooltip-header {
-    font-weight: 700;
-    font-size: 0.95rem;
-    margin-bottom: 8px;
-    color: var(--accent-color);
-    border-bottom: 1px solid var(--light-gray);
-    padding-bottom: 6px;
-}
-
-.tooltip-vencidos ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.tooltip-vencidos ul li {
-    padding: 4px 0;
-    font-size: 0.9rem;
-    border-bottom: 1px solid #f0f0f0;
-    display: flex;
-    justify-content: space-between;
-}
-
-.tooltip-vencidos ul li:last-child {
-    border-bottom: none;
-}
-
-.tooltip-vencidos .item-nome {
-    font-weight: 500;
-}
-
-.tooltip-vencidos .item-dias {
-    color: var(--accent-color);
-    font-weight: 600;
 }
