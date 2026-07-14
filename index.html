@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistema Kantine Lean - Operação Enxuta</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="script.js" defer></script>
+</head>
+<body>
+
+    <header class="header">
+        <div class="container header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>Inventario Ágil</h1>
+                    <p>Sistema de Gerenciamento de Estoque</p>
+                </div>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div>
+                    <p>Gerente da Cozinha</p>
+                    <small>Kantine Gastronomia LTDA</small>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-content">
+
+        <nav class="sidebar">
+            <div class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" data-page="dashboard">
+                        <i class="fas fa-tachometer-alt nav-icon"></i>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="estoque">
+                        <i class="fas fa-boxes nav-icon"></i>
+                        <span class="nav-text">Controle de Estoque</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-page="fichas">
+                        <i class="fas fa-book nav-icon"></i>
+                        <span class="nav-text">Fichas Técnicas</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="content" id="mainContent">
+
+            <div class="dashboard-content" id="dashboardPage">
+                <div class="dashboard-header">
+                    <h2 class="page-title">Dashboard - Visão Geral</h2>
+                    <div class="quick-actions">
+                        <button class="btn btn-primary" id="novaFichaBtn">
+                            <i class="fas fa-plus"></i> Nova Ficha Técnica
+                        </button>
+                        <button class="btn btn-success" id="novaCompraBtn">
+                            <i class="fas fa-shopping-cart"></i> Nova Entrada
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <div class="stat-icon estoque">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="estoqueCritico">0</h3>
+                            <p>Itens em Estoque Crítico</p>
+                        </div>
+                    </div>
+                    <div class="stat-card critico">
+                        <div class="stat-icon critico">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="stat-info critico">
+                            <h3><span id="custoMedio"></span></h3>
+                            <p>Produtos Vencidos</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon qualidade">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="validadeCritica">0</h3>
+                            <p>Itens Próximos do Vencimento</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin:30px 0 20px;">Controle Visual de Estoque (Kanban)</h3>
+                <div class="kanban-container">
+                    <div class="kanban-column">
+                        <div class="kanban-header">
+                            <div class="column-title">
+                                <i class="fas fa-check-circle" style="color:#27ae60;"></i>
+                                <span>OK</span>
+                                <div class="item-count" id="countOk">0</div>
+                            </div>
+                        </div>
+                        <div class="kanban-items" id="kanbanOk"></div>
+                    </div>
+                    <div class="kanban-column">
+                        <div class="kanban-header">
+                            <div class="column-title">
+                                <i class="fas fa-exclamation-triangle" style="color:#f39c12;"></i>
+                                <span>Alerta</span>
+                                <div class="item-count" id="countAlerta">0</div>
+                            </div>
+                        </div>
+                        <div class="kanban-items" id="kanbanAlerta"></div>
+                    </div>
+                    <div class="kanban-column">
+                        <div class="kanban-header">
+                            <div class="column-title">
+                                <i class="fas fa-exclamation-circle" style="color:#e74c3c;"></i>
+                                <span>Crítico</span>
+                                <div class="item-count" id="countCritico">0</div>
+                            </div>
+                        </div>
+                        <div class="kanban-items" id="kanbanCritico"></div>
+                    </div>
+                </div>
+
+                <h3 style="margin:40px 0 20px;">Itens por Validade</h3>
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Controle de Validade dos Itens</h3>
+                        <select id="filtroValidade" style="width:200px;">
+                            <option value="todos">Todos</option>
+                            <option value="critica">Próximos do Vencimento/Vencidos</option>
+                            <option value="alerta">Atenção</option>
+                            <option value="ok">OK</option>
+                        </select>
+                    </div>
+                    <table id="validadeTable">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Categoria</th>
+                                <th>Estoque Atual</th>
+                                <th>Data Validade</th>
+                                <th>Dias Restantes</th>
+                                <th>Status Validade</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="validadeTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="estoque-content" id="estoquePage" style="display:none;">
+                <div class="dashboard-header">
+                    <h2 class="page-title">Controle de Estoque Kanban</h2>
+                    <div class="quick-actions">
+                        <button class="btn btn-primary" id="novoItemBtn"><i class="fas fa-plus"></i> Novo Item</button>
+                        <button class="btn btn-success" id="entradaEstoqueBtn"><i class="fas fa-arrow-down"></i> Entrada</button>
+                        <button class="btn btn-warning" id="saidaEstoqueBtn"><i class="fas fa-arrow-up"></i> Saída</button>
+                        <button class="btn btn-info" id="movimentacoesBtn"><i class="fas fa-history"></i> Histórico</button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Todos os Itens em Estoque</h3>
+                        <input type="text" id="buscarItemInput" placeholder="Buscar item..." style="width:300px;" />
+                    </div>
+                    <table id="estoqueTable">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Categoria</th>
+                                <th>Estoque Atual</th>
+                                <th>Estoque Mín.</th>
+                                <th>Estoque Máx.</th>
+                                <th>Data Validade</th>
+                                <th>Status Validade</th>
+                                <th>Localização</th>
+                                <th>Status Estoque</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="estoqueTableBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="table-container" id="historicoContainer" style="display:none; margin-top:30px;">
+                    <div class="table-header">
+                        <h3>Histórico de Movimentações</h3>
+                        <div>
+                            <select id="filtroTipoMov">
+                                <option value="todos">Todos os tipos</option>
+                                <option value="entrada">Entradas</option>
+                                <option value="saida">Saídas</option>
+                                <option value="ajuste">Ajustes</option>
+                            </select>
+                            <input type="date" id="filtroDataMov" style="margin-left:10px;" />
+                        </div>
+                    </div>
+                    <table id="historicoTable">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Tipo</th>
+                                <th>Item</th>
+                                <th>Quantidade</th>
+                                <th>Unidade</th>
+                                <th>Fornecedor/Responsável</th>
+                                <th>Motivo</th>
+                                <th>Lote</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historicoTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="fichas-content" id="fichasPage" style="display:none;">
+                <div class="dashboard-header">
+                    <h2 class="page-title">Fichas Técnicas e POPs</h2>
+                    <div class="quick-actions">
+                        <button class="btn btn-primary" id="novaReceitaBtn"><i class="fas fa-plus"></i> Nova Receita</button>
+                        <button class="btn btn-info" id="gerarPOPBtn"><i class="fas fa-print"></i> Gerar POP</button>
+                    </div>
+                </div>
+
+                <div class="tabs" style="margin-bottom:20px;">
+                    <div class="tab active" data-subtab="fichas-list">Todas as Receitas</div>
+                    <div class="tab" data-subtab="fichas-detail">Detalhes da Receita</div>
+                    <div class="tab" data-subtab="fichas-pops">POPs</div>
+                </div>
+
+                <div id="fichas-list" class="tab-content active">
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3>Todas as Receitas Cadastradas</h3>
+                            <select id="filtroCategoriaReceita" style="width:200px;">
+                                <option value="">Todas as categorias</option>
+                                <option value="Prato Principal">Prato Principal</option>
+                                <option value="Guarnição">Guarnição</option>
+                                <option value="Salada">Salada</option>
+                                <option value="Sobremesa">Sobremesa</option>
+                                <option value="Molho">Molho</option>
+                                <option value="outro">Outro</option>
+                            </select>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Receita</th>
+                                    <th>Categoria</th>
+                                    <th>Porções</th>
+                                    <th>Custo/Porção</th>
+                                    <th>Tempo</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="receitasTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="fichas-detail" class="tab-content" style="display:none;">
+                    <div class="recipe-card">
+                        <div class="recipe-header">
+                            <h3 class="recipe-title" id="detailRecipeTitle">Feijoada Completa</h3>
+                            <div class="recipe-cost" id="detailRecipeCost">Custo por porção: R$ 8,75</div>
+                        </div>
+                        <div class="recipe-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Categoria</span>
+                                <span class="detail-value" id="detailRecipeCategory">Prato Principal</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Porções</span>
+                                <span class="detail-value" id="detailRecipePortions">20</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Tempo de Preparo</span>
+                                <span class="detail-value" id="detailRecipeTime">120 min</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Lucro</span>
+                                <span class="detail-value" id="detailRecipeYield">95%</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Custo Total</span>
+                                <span class="detail-value" id="detailRecipeTotalCost">R$ 175,00</span>
+                            </div>
+                        </div>
+
+                        <div style="margin-top:15px;">
+                            <h4>Ingredientes:</h4>
+                            <table class="ingredients-table" style="width:100%;margin-top:10px;">
+                                <thead>
+                                    <tr>
+                                        <th>Ingrediente</th>
+                                        <th>Quantidade</th>
+                                        <th>Custo Unitário</th>
+                                        <th>Custo Total</th>
+                                        <th>Estoque</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ingredientesTableBody"></tbody>
+                            </table>
+                        </div>
+
+                        <div style="margin-top:20px;">
+                            <h4>Modo de Preparo (POP):</h4>
+                            <div id="detailRecipeInstructions" style="margin-top:10px;padding:15px;background-color:#f8f9fa;border-radius:var(--radius);">
+                                <ol id="recipeInstructionsList" style="margin-left:20px;"></ol>
+                            </div>
+                        </div>
+
+                        <div style="margin-top:20px;">
+                            <h4>Informações Nutricionais (por porção):</h4>
+                            <div class="recipe-details" style="margin-top:10px;">
+                                <div class="detail-item">
+                                    <span class="detail-label">Calorias</span>
+                                    <span class="detail-value" id="detailRecipeCalories">450 kcal</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Proteínas</span>
+                                    <span class="detail-value" id="detailRecipeProteins">25g</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Carboidratos</span>
+                                    <span class="detail-value" id="detailRecipeCarbs">35g</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Gorduras</span>
+                                    <span class="detail-value" id="detailRecipeFats">18g</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions" style="margin-top:30px;">
+                            <button class="btn btn-outline" id="backToRecipesBtn">
+                                <i class="fas fa-arrow-left"></i> Voltar para Receitas
+                            </button>
+                            <button class="btn btn-primary" id="editarReceitaBtn">Editar Ficha</button>
+                            <button class="btn btn-success" id="produzirReceitaBtn">Produzir Receita</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="fichas-pops" class="tab-content" style="display:none;">
+                    <div class="pops-container">
+                        <h3>Procedimentos Operacionais Padrão (POPs)</h3>
+                        <p style="margin-bottom:20px;color:var(--gray-color);">
+                            POPs padronizam os processos da cozinha para garantir qualidade e segurança alimentar.
+                        </p>
+
+                        <div class="pop-card">
+                            <div class="pop-header">
+                                <h4>POP-001: Recebimento de Matéria-Prima</h4>
+                                <span class="badge badge-success">Ativo</span>
+                            </div>
+                            <div class="pop-body">
+                                <p><strong>Objetivo:</strong> Estabelecer o procedimento para recebimento, inspeção e armazenamento de matéria-prima.</p>
+                                <p><strong>Responsável:</strong> Auxiliar de Cozinha/Estoquista</p>
+                                <div class="pop-steps">
+                                    <h5>Passos do Procedimento:</h5>
+                                    <ol>
+                                        <li>Verificar nota fiscal e pedido de compra</li>
+                                        <li>Inspecionar qualidade dos produtos</li>
+                                        <li>Rejeitar produtos fora do padrão</li>
+                                        <li>Registrar entrada no sistema</li>
+                                        <li>Armazenar conforme categoria</li>
+                                        <li>Aplicar etiqueta com data</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pop-card">
+                            <div class="pop-header">
+                                <h4>POP-002: Pré-preparo de Hortifruti</h4>
+                                <span class="badge badge-success">Ativo</span>
+                            </div>
+                            <div class="pop-body">
+                                <p><strong>Objetivo:</strong> Padronizar o processo de higienização e corte de frutas, legumes e verduras.</p>
+                                <p><strong>Responsável:</strong> Auxiliar de Cozinha</p>
+                                <div class="pop-steps">
+                                    <h5>Passos do Procedimento:</h5>
+                                    <ol>
+                                        <li>Selecionar produtos</li>
+                                        <li>Lavar em água corrente</li>
+                                        <li>Imersão em solução clorada</li>
+                                        <li>Enxágue em água potável</li>
+                                        <li>Secar adequadamente</li>
+                                        <li>Cortar conforme padrão</li>
+                                        <li>Armazenar identificado</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modais (mantidos iguais) -->
+    <div class="modal" id="novoItemModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Cadastrar Novo Item no Estoque</h3>
+                <button class="modal-close" id="closeNovoItemModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="novoItemForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="itemCodigo">Código do Item *</label>
+                            <input type="text" id="itemCodigo" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="itemNome">Nome do Item *</label>
+                            <input type="text" id="itemNome" required />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="itemCategoria">Categoria *</label>
+                            <select id="itemCategoria" required>
+                                <option value="">Selecione...</option>
+                                <option value="Proteína">Proteína</option>
+                                <option value="Legume">Legume</option>
+                                <option value="Grão">Grão</option>
+                                <option value="Tempero">Tempero</option>
+                                <option value="oleo">Oléos/Azeites</option>
+                                <option value="Outro">Outros</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="itemUnidade">Unidade *</label>
+                            <select id="itemUnidade" required>
+                                <option value="">Selecione...</option>
+                                <option value="kg">kg</option>
+                                <option value="g">g</option>
+                                <option value="un">un</option>
+                                <option value="lt">lt</option>
+                                <option value="ml">ml</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="estoqueMin">Estoque Mínimo *</label>
+                            <input type="number" id="estoqueMin" required min="0" step="any" />
+                        </div>
+                        <div class="form-group">
+                            <label for="estoqueMax">Estoque Máximo *</label>
+                            <input type="number" id="estoqueMax" required min="0" step="any" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="localizacao">Localização na Cozinha *</label>
+                            <input type="text" id="localizacao" placeholder="Ex: Prateleira A1, Freezer 2" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="quantidadeInicial">Quantidade</label>
+                            <input type="number" id="quantidadeInicial" min="0" step="any" value="0" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="validadePadraoData">Data de Validade</label>
+                            <input type="date" id="validadePadraoData" />
+                            <small>Data padrão de validade para novos lotes deste item</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="custoUnitario">Custo Unitário (R$)</label>
+                            <input type="number" id="custoUnitario" min="0" step="any" value="0" />
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" id="cancelarNovoItem">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar Item</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="novaFichaModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Nova Ficha Técnica</h3>
+                <button class="modal-close" id="closeFichaModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="novaFichaForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="receitaCodigo">Código da Receita *</label>
+                            <input type="text" id="receitaCodigo" required placeholder="Ex: REC001" />
+                        </div>
+                        <div class="form-group">
+                            <label for="receitaNome">Nome da Receita *</label>
+                            <input type="text" id="receitaNome" required placeholder="Ex: Feijoada Completa" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="receitaCategoria">Categoria *</label>
+                            <select id="receitaCategoria" required>
+                                <option value="">Selecione...</option>
+                                <option value="Prato Principal">Prato Principal</option>
+                                <option value="Guarnição">Guarnição</option>
+                                <option value="Salada">Salada</option>
+                                <option value="Sobremesa">Sobremesa</option>
+                                <option value="Molho">Molho</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="receitaPorcoes">Número de Porções *</label>
+                            <input type="number" id="receitaPorcoes" required min="1" value="1" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tempoPreparo">Tempo de Preparo (minutos) *</label>
+                            <input type="number" id="tempoPreparo" required min="1" value="30" />
+                        </div>
+                        <div class="form-group">
+                            <label for="lucro">Lucro Esperado (%)</label>
+                            <input type="number" id="lucro" min="1" max="100" value="95" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="receitaDescricao">Descrição da Receita</label>
+                        <textarea id="receitaDescricao" rows="3" placeholder="Descreva brevemente a receita..."></textarea>
+                    </div>
+
+                    <div style="margin-top:20px; border-top:1px solid var(--light-gray); padding-top:15px;">
+                        <h4>Ingredientes</h4>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:2;">
+                                <label for="ingredienteItem">Item do Estoque</label>
+                                <select id="ingredienteItem">
+                                    <option value="">Selecione um item...</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label for="ingredienteQuantidade">Quantidade</label>
+                                <input type="number" id="ingredienteQuantidade" min="0.01" step="any" value="1" />
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label for="ingredienteUnidade">Unidade</label>
+                                <select id="ingredienteUnidade">
+                                    <option value="kg">kg</option>
+                                    <option value="g">g</option>
+                                    <option value="un">un</option>
+                                    <option value="lt">lt</option>
+                                    <option value="ml">ml</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="flex:0.5; display:flex; align-items:flex-end;">
+                                <button type="button" class="btn btn-success" id="addIngredienteBtn" style="width:100%;">+</button>
+                            </div>
+                        </div>
+                        <div style="margin-top:10px;">
+                            <table class="ingredients-table" style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Quantidade</th>
+                                        <th>Unidade</th>
+                                        <th>Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ingredientesListaModal"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" id="cancelarFicha">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar Ficha</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="entradaModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Registrar Entrada de Produto</h3>
+                <button class="modal-close" id="closeEntradaModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="entradaForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="entradaItem">Item *</label>
+                            <select id="entradaItem" required>
+                                <option value="">Selecione um item...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="entradaQuantidade">Quantidade *</label>
+                            <input type="number" id="entradaQuantidade" required min="0.01" step="any" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="entradaLote">Número do Lote</label>
+                            <input type="text" id="entradaLote" placeholder="Opcional" />
+                        </div>
+                        <div class="form-group">
+                            <label for="entradaValidade">Data de Validade</label>
+                            <input type="date" id="entradaValidade" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="entradaFornecedor">Fornecedor</label>
+                            <input type="text" id="entradaFornecedor" placeholder="Nome do fornecedor" />
+                        </div>
+                        <div class="form-group">
+                            <label for="entradaNotaFiscal">Nº Nota Fiscal</label>
+                            <input type="text" id="entradaNotaFiscal" placeholder="Número da nota fiscal" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="entradaObservacoes">Observações</label>
+                        <textarea id="entradaObservacoes" rows="3" placeholder="Observações sobre a entrada..."></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" id="cancelarEntrada">Cancelar</button>
+                        <button type="submit" class="btn btn-success">Registrar Entrada</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="saidaModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Registrar Saída de Produto</h3>
+                <button class="modal-close" id="closeSaidaModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="saidaForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="saidaItem">Item *</label>
+                            <select id="saidaItem" required>
+                                <option value="">Selecione um item...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="saidaQuantidade">Quantidade *</label>
+                            <input type="number" id="saidaQuantidade" required min="0.01" step="any" />
+                            <small id="estoqueDisponivel" style="color: var(--gray-color);"></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="saidaUnidade">Medida *</label>
+                            <select id="saidaUnidade" required>
+                                <option value="kg">Kg</option>
+                                <option value="g">g</option>
+                                <option value="un">un</option>
+                                <option value="lt">Lt</option>
+                                <option value="ml">ml</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="saidaMotivo">Motivo da Saída *</label>
+                            <select id="saidaMotivo" required>
+                                <option value="">Selecione...</option>
+                                <option value="producao">Produção</option>
+                                <option value="avaria">Avaria/Perda</option>
+                                <option value="ajuste">Ajuste de Estoque</option>
+                                <option value="transferencia">Transferência</option>
+                                <option value="outro">Outro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="saidaResponsavel">Responsável *</label>
+                            <input type="text" id="saidaResponsavel" required value="Cozinha" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="saidaLote">Lote (PEPS/FIFO)</label>
+                            <select id="saidaLote">
+                                <option value="">Automático (PEPS)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="saidaObservacoes">Observações</label>
+                        <textarea id="saidaObservacoes" rows="3" placeholder="Observações sobre a saída..."></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" id="cancelarSaida">Cancelar</button>
+                        <button type="submit" class="btn btn-warning">Registrar Saída</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification" style="display: none;">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText">Operação realizada com sucesso!</span>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+</body>
+</html>
